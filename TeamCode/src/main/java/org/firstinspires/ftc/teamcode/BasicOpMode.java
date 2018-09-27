@@ -53,9 +53,7 @@ import org.opencv.core.Mat;
  */
 
 @TeleOp(name="Basic: Iterative OpMode", group="Iterative Opmode")
-@Disabled
 public class BasicOpMode extends OpMode {
-    Mat
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive = null;
