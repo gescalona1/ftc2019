@@ -24,5 +24,5 @@ repositories {
 apply from: 'build.release.gradle'
 
 dependencies {
-    api files('/Users/gescalona/Desktop/ftc 2019/opencv-342.jar')
+    api files('../opencv-342.jar')
 }
