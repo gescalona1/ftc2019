@@ -78,7 +78,7 @@ public class SensorMRGyro extends LinearOpMode {
     // on this object to illustrate which interfaces support which functionality.
     modernRoboticsI2cGyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
     gyro = (IntegratingGyroscope)modernRoboticsI2cGyro;
-    // If you're only interested int the IntegratingGyroscope interface, the following will suffice.
+    // If you're only interested in the IntegratingGyroscope interface, the following will suffice.
     // gyro = hardwareMap.get(IntegratingGyroscope.class, "gyro");
     // A similar approach will work for the Gyroscope interface, if that's all you need.
 

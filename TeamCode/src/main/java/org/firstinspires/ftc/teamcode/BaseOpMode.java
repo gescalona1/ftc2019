@@ -14,13 +14,13 @@ import org.firstinspires.ftc.teamcode.robot.RobotDriver;
  * Created by gescalona on 9/28/18.
  */
 
-public abstract class BaseOpMode extends OpMode {
+public abstract class BaseOpMode extends OpMode implements UsesHardware {
     protected ElapsedTime runtime = new ElapsedTime();
 
-    protected DcMotor leftTopDrive = null;
-    protected DcMotor leftBottomDrive = null;
-    protected DcMotor rightTopDrive = null;
-    protected DcMotor rightBottomDrive = null;
+    protected DcMotor leftFrontDrive = null;
+    protected DcMotor rightFrontDrive = null;
+    protected DcMotor leftBackDrive = null;
+    protected DcMotor rightBackDrive = null;
 
 
     @Override
@@ -33,43 +33,58 @@ public abstract class BaseOpMode extends OpMode {
     private void inita(){
         this.runtime.reset();
         telemetry.addData("Status", "Initialized");
-
+        hardwareInit();
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftTopDrive  = hardwareMap.get(DcMotor.class, "lefttop_drive");
-        leftBottomDrive = hardwareMap.get(DcMotor.class, "leftbottom_drive");
-        rightTopDrive  = hardwareMap.get(DcMotor.class, "righttop_drive");
-        rightBottomDrive = hardwareMap.get(DcMotor.class, "rightbottom_drive");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftTopDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBottomDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightTopDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBottomDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
-
     }
 
     abstract void initb();
 
-    public DcMotor getLeftTopDrive() {
-        return leftTopDrive;
+    @Override
+    public void hardwareInit() {
+        //<editor-fold desc="DcMotorSetup">
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftfront_drive");
+        rightFrontDrive  = hardwareMap.get(DcMotor.class, "rightfront_drive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "leftback_drive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        //</editor-fold>
+
     }
 
-    public DcMotor getLeftBottomDrive() {
-        return leftBottomDrive;
+    @Override
+    public DcMotor getLeftFrontDrive() {
+        return leftFrontDrive;
     }
 
-    public DcMotor getRightTopDrive() {
-        return rightTopDrive;
+    @Override
+    public DcMotor getRightFrontDrive() {
+        return rightFrontDrive;
     }
 
-    public DcMotor getRightBottomDrive() {
-        return rightBottomDrive;
+    @Override
+    public DcMotor getLeftBackDrive() {
+        return leftBackDrive;
+    }
+
+    @Override
+    public DcMotor getRightBackDrive() {
+        return rightBackDrive;
+    }
+
+    @Override
+    public void stop(){
+        RobotDriver.getDriver().setHardwareMap(null, null);
     }
 
 }
