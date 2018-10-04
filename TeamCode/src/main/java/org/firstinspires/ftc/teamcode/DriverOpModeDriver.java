@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
@@ -91,8 +92,10 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         double leftStickX = -gamepad1.left_stick_x;
 
         double rightStickX = -gamepad1.right_stick_x;
-
         RobotDriver.getDriver().mecanumDrive(leftStickX, leftStickY, rightStickX);
+        if(gamepad1.a){
+            RobotDriver.getDriver().gyroTurn(90);
+        }
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward slowly and keep straight.
         // leftPower  = -gamepad1.left_stick_y ;

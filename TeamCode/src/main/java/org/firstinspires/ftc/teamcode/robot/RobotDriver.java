@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.UsesHardware;
 
 /**
- * Created by gescalona on 9/28/18obot.
+ * Created by gescalona on 9/28/18
  */
 
 public class RobotDriver {
@@ -17,7 +17,9 @@ public class RobotDriver {
     private UsesHardware opmode;
     private HardwareMap hardwareMap = null;
 
+    private final double CORRECT_ANGLE_RANGE = 0.1;
     private Orientation currentAngle;
+
     public void mecanumDrive(double leftX, double leftY, double rightX){
         //taken from last year's code
         // how much to amplify the power
@@ -35,28 +37,55 @@ public class RobotDriver {
         opmode.getRightBackDrive().setPower(v4);
 
     }
-
     public void gyroTurn(int angle){
+        resetAngle();
         if(angle != 0){
             return;
         }
-        boolean turnRight = true;
+        final double leftfrontpower, leftbackpower, rightfrontpower, rightbackpower;
         if(angle < 0){
-            turnRight = false;
-        }
-        Thread thread = new Thread(new Runnable() {
+            leftfrontpower = 1;
+            leftbackpower = 1;
+            rightfrontpower = -1;
+            rightbackpower = -1;
+        }else if (angle > 90){
+            leftfrontpower = -1;
+            leftbackpower = -1;
+            rightfrontpower = 1;
+            rightbackpower = 1;
+        }else thro
+        new Thread(new Runnable() {
             private volatile boolean running = true;
             private int requiredAngle = angle;
             @Override
             public void run() {
-                if(running){
-
+                while(running){
+                    opmode.getLeftFrontDrive().setPower(leftfrontpower);
+                    opmode.getLeftBackDrive().setPower(leftbackpower);
+                    opmode.getRightFrontDrive().setPower(rightfrontpower);
+                    opmode.getRightBackDrive().setPower(rightbackpower);
+                    if(getRelativeAngle() > CORRECT_ANGLE_RANGE && getRelativeAngle() < CORRECT_ANGLE_RANGE){
+                        running = false;
+                        opmode.getLeftFrontDrive().setPower(0);
+                        opmode.getLeftBackDrive().setPower(0);
+                        opmode.getRightFrontDrive().setPower(0);
+                        opmode.getRightBackDrive().setPower(0);
+                        return;
+                    }
                 }
             }
-        });
-        thread.start();
+        }).start();
     }
 
+    public void resetAngle(){
+        currentAngle = opmode.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    }
+    public float correctAngle(float firstAngle){
+        if(firstAngle < 0){
+            firstAngle += 360;
+        }
+        return firstAngle;
+    }
     public float getCurrentAngle(){
         return currentAngle.firstAngle;
     }
@@ -67,9 +96,14 @@ public class RobotDriver {
         return angles.firstAngle;
     }
 
-    public float getCorrectedAngle(float angle){
-
+    public float getRelativeAngle(){
+        /*
+        In relative to the current angle
+        MUST BE CORRECTED
+         */
+        return  correctAngle(getAngle(false) -  correctAngle(getCurrentAngle()));
     }
+
     /*
     End
      */
@@ -91,5 +125,6 @@ public class RobotDriver {
     public final void setHardwareMap(UsesHardware opMode, HardwareMap map){
         this.opmode = opMode;
         this.hardwareMap = map;
+        resetAngle();
     }
 }
