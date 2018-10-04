@@ -29,15 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
-import org.opencv.core.Mat;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -53,8 +47,8 @@ import org.opencv.core.Mat;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Iterative OpMode", group="Iterative Opmode")
-public class DriverOpMode extends BaseOpMode {
+@TeleOp(name="Driver Op Mode", group="driver")
+public class DriverOpModeDriver extends DriverBaseOpMode {
     // Declare OpMode members.
 
 

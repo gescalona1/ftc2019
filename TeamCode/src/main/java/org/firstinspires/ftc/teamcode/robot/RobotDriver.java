@@ -1,17 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Hardware;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
-import org.firstinspires.ftc.robotcore.external.Consumer;
-import org.firstinspires.ftc.teamcode.BaseOpMode;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.UsesHardware;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by gescalona on 9/28/18obot.
@@ -22,6 +17,7 @@ public class RobotDriver {
     private UsesHardware opmode;
     private HardwareMap hardwareMap = null;
 
+    private Orientation currentAngle;
     public void mecanumDrive(double leftX, double leftY, double rightX){
         //taken from last year's code
         // how much to amplify the power
@@ -44,22 +40,36 @@ public class RobotDriver {
         if(angle != 0){
             return;
         }
-        boolean goRight = true;
+        boolean turnRight = true;
         if(angle < 0){
-            goRight = false;
+            turnRight = false;
         }
         Thread thread = new Thread(new Runnable() {
             private volatile boolean running = true;
             private int requiredAngle = angle;
             @Override
             public void run() {
-                while(running){
+                if(running){
 
                 }
             }
         });
+        thread.start();
     }
 
+    public float getCurrentAngle(){
+        return currentAngle.firstAngle;
+    }
+
+    public float getAngle(boolean overwrite){
+        Orientation angles = this.opmode.getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        if(overwrite) currentAngle = angles;
+        return angles.firstAngle;
+    }
+
+    public float getCorrectedAngle(float angle){
+
+    }
     /*
     End
      */

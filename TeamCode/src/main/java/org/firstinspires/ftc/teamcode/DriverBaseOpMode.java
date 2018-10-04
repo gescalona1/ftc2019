@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Hardware;
 
@@ -14,8 +17,12 @@ import org.firstinspires.ftc.teamcode.robot.RobotDriver;
  * Created by gescalona on 9/28/18.
  */
 
-public abstract class BaseOpMode extends OpMode implements UsesHardware {
+public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     protected ElapsedTime runtime = new ElapsedTime();
+
+    protected int cameraViewId;
+
+    protected BNO055IMU imu;
 
     protected DcMotor leftFrontDrive = null;
     protected DcMotor rightFrontDrive = null;
@@ -48,7 +55,8 @@ public abstract class BaseOpMode extends OpMode implements UsesHardware {
     abstract void initb();
 
     @Override
-    public void hardwareInit() {
+    public void hardwareInit(){
+        cameraViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         //<editor-fold desc="DcMotorSetup">
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftfront_drive");
         rightFrontDrive  = hardwareMap.get(DcMotor.class, "rightfront_drive");
@@ -59,7 +67,15 @@ public abstract class BaseOpMode extends OpMode implements UsesHardware {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         //</editor-fold>
-
+        //<editor-fold desc="GyroConfiguration">
+        while (!imu.isGyroCalibrated()) {
+            try {
+                wait(50);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        //</editor-fold>
     }
 
     @Override
@@ -83,8 +99,13 @@ public abstract class BaseOpMode extends OpMode implements UsesHardware {
     }
 
     @Override
-    public void stop(){
-        RobotDriver.getDriver().setHardwareMap(null, null);
+    public BNO055IMU getImu(){
+        return imu;
+    }
+
+    @Override
+    public int getCameraViewId(){
+        return cameraViewId;
     }
 
 }
