@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -20,7 +21,18 @@ public class RobotDriver {
     private final double CORRECT_ANGLE_RANGE = 0.1;
     private Orientation currentAngle;
 
-    public void mecanumDrive(double leftX, double leftY, double rightX){
+    public void mecanumDrive(double left_stick_y, double left_stick_x, double right_stick_x){
+        double LB = Range.clip(-left_stick_y - left_stick_x + right_stick_x, -1, 1);
+        double LF = Range.clip(-left_stick_y + left_stick_x + right_stick_x, -1, 1);
+        double RB = Range.clip(-left_stick_y + left_stick_x - right_stick_x, -1, 1);
+        double RF = Range.clip(-left_stick_y - left_stick_x - right_stick_x, -1, 1);
+        opmode.getLeftBackDrive().setPower(LB);
+        opmode.getLeftFrontDrive().setPower(LF);
+        opmode.getRightBackDrive().setPower(RB);
+        opmode.getRightFrontDrive().setPower(RF);
+    }
+    @Deprecated
+    public void oldMecanumDrive(double leftX, double leftY, double rightX){
         //taken from last year's code
         // how much to amplify the power
         double r = Math.hypot(leftY, leftX);
@@ -35,7 +47,6 @@ public class RobotDriver {
         opmode.getRightFrontDrive().setPower(v2);
         opmode.getLeftBackDrive().setPower(v3);
         opmode.getRightBackDrive().setPower(v4);
-
     }
     public void gyroTurn(int angle){
         resetAngle();

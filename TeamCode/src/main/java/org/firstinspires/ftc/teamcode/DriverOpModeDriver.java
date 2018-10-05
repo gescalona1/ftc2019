@@ -89,9 +89,9 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         // POV Mode uses left stick to go forward, and right stick to turn.
         // - This uses basic math to combine motions and is easier to drive straight.
         double leftStickY = gamepad1.left_stick_y;
-        double leftStickX = -gamepad1.left_stick_x;
+        double leftStickX = gamepad1.left_stick_x;
 
-        double rightStickX = -gamepad1.right_stick_x;
+        double rightStickX = gamepad1.right_stick_x;
         RobotDriver.getDriver().mecanumDrive(leftStickX, leftStickY, rightStickX);
         if(gamepad1.a){
             RobotDriver.getDriver().gyroTurn(90);
