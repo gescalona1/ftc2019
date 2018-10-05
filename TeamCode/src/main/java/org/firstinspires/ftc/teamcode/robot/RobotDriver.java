@@ -64,7 +64,7 @@ public class RobotDriver {
             leftbackpower = -1;
             rightfrontpower = 1;
             rightbackpower = 1;
-        }else thro
+        }
         new Thread(new Runnable() {
             private volatile boolean running = true;
             private int requiredAngle = angle;
