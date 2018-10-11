@@ -30,24 +30,17 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.robot.Robot;
 
+import org.firstinspires.ftc.teamcode.baseopmodes.DriverBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
 /**
- * This file contains an example of an iterative (Non-Linear) "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
+ * Ultro
+ * DriverOpModeDriver.java
+ * Purpose: Extends from DriverBaseOpMode
  *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all iterative OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+ * @version 1.0 10/11/2018
  */
-
 @TeleOp(name="Driver Op Mode", group="driver")
 public class DriverOpModeDriver extends DriverBaseOpMode {
     // Declare OpMode members.
@@ -57,8 +50,8 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
      * Code to run ONCE when the driver hits INIT
      */
     @Override
-    public void initb() {
-        RobotDriver.getDriver().setHardwareMap(this, this.hardwareMap);
+    public void initb(){
+
     }
 
     /*
@@ -92,10 +85,15 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         double leftStickX = gamepad1.left_stick_x;
 
         double rightStickX = gamepad1.right_stick_x;
-        RobotDriver.getDriver().mecanumDrive(leftStickX, leftStickY, rightStickX);
-        if(gamepad1.a){
-            RobotDriver.getDriver().gyroTurn(90);
+        RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
+        synchronized (this){
+            telemetry.addData("gyro turning","Started");
+            if(this.gamepad1.a){
+                RobotDriver.getDriver().gyroTurn(90, 0.15);
+                telemetry.addData("gyro turning", "ended");
+            }
         }
+
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward slowly and keep straight.
         // leftPower  = -gamepad1.left_stick_y ;
@@ -105,6 +103,10 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
 
 
         // Show the elapsed game time and wheel power.
+        telemetry.addData("A button", gamepad1.a);
+        telemetry.addData("Angle", RobotDriver.getDriver().getAngle());
+        telemetry.addData("CurrentAngle", RobotDriver.getDriver().getCurrentAngle());
+        telemetry.addData("RelativeAngle", RobotDriver.getDriver().getRelativeAngle());
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)");
     }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.baseopmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
@@ -11,36 +11,34 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Hardware;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
+import org.firstinspires.ftc.teamcode.UsesHardware;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
 /**
- * Created by gescalona on 9/28/18.
+ * Ultro
+ * DriverBaseOpMode.java
+ * Purpose: Base OP mode for all driver classes
+ *
+ * @version 1.0 10/11/2018
  */
 
 public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     protected ElapsedTime runtime = new ElapsedTime();
-
-    protected int cameraViewId;
-
-    protected BNO055IMU imu;
-
-    protected DcMotor leftFrontDrive = null;
-    protected DcMotor rightFrontDrive = null;
-    protected DcMotor leftBackDrive = null;
-    protected DcMotor rightBackDrive = null;
+    protected org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap map;
 
 
     @Override
     public void init() {
-        RobotDriver.getDriver().setHardwareMap(this, hardwareMap);
+        hardwareInit();
+        RobotDriver.getDriver().setHardwareMap(this);
+        RobotDriver.getDriver().resetAngle();
         inita();
         initb();
     }
 
     private void inita(){
         this.runtime.reset();
-        telemetry.addData("Status", "Initialized");
-        hardwareInit();
+        telemetry.addData("Status", "Initializing");
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
@@ -52,60 +50,42 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
         telemetry.addData("Status", "Initialized");
     }
 
-    abstract void initb();
+    public abstract void initb();
 
     @Override
     public void hardwareInit(){
-        cameraViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        //<editor-fold desc="DcMotorSetup">
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftfront_drive");
-        rightFrontDrive  = hardwareMap.get(DcMotor.class, "rightfront_drive");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "leftback_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "rightback_drive");
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        //</editor-fold>
-        //<editor-fold desc="GyroConfiguration">
-        while (!imu.isGyroCalibrated()) {
-            try {
-                wait(50);
-            }catch (InterruptedException e){
-                e.printStackTrace();
-            }
-        }
-        //</editor-fold>
+        map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
+        map.hardwareInit(telemetry);
     }
 
     @Override
     public DcMotor getLeftFrontDrive() {
-        return leftFrontDrive;
+        return map.getLeftFrontDrive();
     }
 
     @Override
     public DcMotor getRightFrontDrive() {
-        return rightFrontDrive;
+        return map.getRightFrontDrive();
     }
 
     @Override
     public DcMotor getLeftBackDrive() {
-        return leftBackDrive;
+        return map.getLeftBackDrive();
     }
 
     @Override
     public DcMotor getRightBackDrive() {
-        return rightBackDrive;
+        return map.getRightBackDrive();
     }
 
     @Override
-    public BNO055IMU getImu(){
-        return imu;
+    public BNO055IMU getImu() {
+        return map.getImu();
     }
 
     @Override
     public int getCameraViewId(){
-        return cameraViewId;
+        return map.getCameraViewId();
     }
 
 }
