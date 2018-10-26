@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.cf.direct.ClassPathOp
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,31 +20,54 @@ import java.util.List;
  */
 public class ThreadManager {
     private static volatile ThreadManager threadManager = null;
-    private List<Thread> startedThreads = new ArrayList<>();
-    private List<RobotThread> threads = new ArrayList<>();
+    private HashMap<Runnable, Thread> runnableThreadsMap = new HashMap<>();
+    private List<Thread> threads = new ArrayList<>();
 
-    public void createThread(RobotThread robotThread){
-        threads.add(robotThread);
-    }
-
-    public void startThread(RobotThread robotThread){
-        if(threads.contains(robotThread)){
-           Thread t = new Thread(robotThread);
-           t.start();
-           startedThreads.add(t);
-
+    public void createThread(Runnable runnable){
+        if(runnableThreadsMap.containsKey(runnable)) {
+            Thread thread = new Thread(runnable);
+            threads.add(thread);
+            runnableThreadsMap.put(runnable, thread);
         }
     }
 
-    public void stopThread(RobotThread robotThread){
+    public void addThread(Thread thread){
+        threads.add(thread);
+    }
+
+    public void deleteThread(Thread robotThread){
+        threads.remove(robotThread);
+        runnableThreadsMap.remove(robotThread);
+        robotThread.interrupt();
+    }
+
+    public void startThread(Thread thread){
+        if(threads.contains(thread)){
+            thread.start();
+        }
+    }
+    public void startThread(Runnable runnable){
+        if(threads.contains(runnableThreadsMap.get(runnable))){
+            startThread(runnableThreadsMap.get(runnable));
+        }
+    }
+
+    public void stopThread(Thread robotThread){
         if(threads.contains(robotThread)){
-            robotThread.stopRunning();
+            robotThread.interrupt();
+            deleteThread(robotThread);
+        }
+    }
+    public void stopThread(Runnable runnable){
+        if(threads.contains(runnableThreadsMap.get(runnable))){
+            Thread t = runnableThreadsMap.get(runnable);
+            stopThread(t);
         }
     }
 
     public void stopAll(){
-        for (RobotThread t : threads){
-            t.stopRunning();
+        for (Thread t : threads){
+            stopThread(t);
         }
     }
     /**

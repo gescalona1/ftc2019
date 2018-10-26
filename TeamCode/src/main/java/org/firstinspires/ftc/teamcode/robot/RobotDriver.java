@@ -22,8 +22,9 @@ import org.firstinspires.ftc.teamcode.util.ThreadManager;
 public class RobotDriver {
     private static volatile RobotDriver driver = null;
     private UsesHardware opmode;
+    private boolean gyroTurning = false;
 
-    private final double CORRECT_ANGLE_RANGE = 1;
+    private final double CORRECT_ANGLE_RANGE = 2.5;
     private Orientation currentAngle;
     /**
      * Updated mecanum drive function this year (math is ? ?? ? )
@@ -67,66 +68,76 @@ public class RobotDriver {
     }
     /**
      * Turns the machine using the built in imu, uses a thread to constantly check if the correct angle is met
-     * @param angle required angle to rotate
+     * @param angle required angle to rotate [-180, 180]
      * @param power how much speed will the robot move
      */
     public void gyroTurn(int angle, double power){
-        if(angle == 0){
-            return;
-        }
-        resetAngle();
-        final double leftfrontpower, leftbackpower, rightfrontpower, rightbackpower;
-        if(angle < 0){
-            leftfrontpower = -power;
-            leftbackpower = -power;
-            rightfrontpower = power;
-            rightbackpower = power;
-        }else if (angle > 0){
-            leftfrontpower = power;
-            leftbackpower = power;
-            rightfrontpower = -power;
-            rightbackpower = -power;
-        }else {
-            leftfrontpower = 0;
-            leftbackpower = 0;
-            rightfrontpower = 0;
-            rightbackpower = 0;
-        }
-
-        Thread t = new Thread(new Runnable() {
-            private volatile boolean running = true;
-            private int requiredAngle = angle;
-            @Override
-            public void run() {
-                opmode.getLeftFrontDrive().setPower(leftfrontpower);
-                opmode.getLeftBackDrive().setPower(leftbackpower);
-                opmode.getRightFrontDrive().setPower(rightfrontpower);
-                opmode.getRightBackDrive().setPower(rightbackpower);
-                int i = 0;
-                while(running){
-                    if(opmode instanceof OpMode){
-                        ((OpMode) opmode).telemetry.addLine("Gyro turning is being done");
-
-                        ((OpMode) opmode).telemetry.addData("Actual angle expected", angle);
-                        ((OpMode) opmode).telemetry.addData("What it is now", getAngle());
-                        ((OpMode) opmode).telemetry.addData("What it was then", getCurrentAngle());
-                        ((OpMode) opmode).telemetry.addData("difference", getRelativeAngle());
-                        ((OpMode) opmode).telemetry.addData("difference boolean", (getRelativeAngle() > angle + CORRECT_ANGLE_RANGE && getRelativeAngle() < angle + CORRECT_ANGLE_RANGE));
-                        ((OpMode) opmode).telemetry.addData("checked how many times:", i);
-                    }
-                    if(getRelativeAngle() > angle + CORRECT_ANGLE_RANGE && getRelativeAngle() < angle + CORRECT_ANGLE_RANGE){
-                        running = false;
-                        opmode.getLeftFrontDrive().setPower(0);
-                        opmode.getLeftBackDrive().setPower(0);
-                        opmode.getRightFrontDrive().setPower(0);
-                        opmode.getRightBackDrive().setPower(0);
-                        return;
-                    }
-                    i++;
-                }
+        if(!gyroTurning) {
+            if (angle == 0) {
+                return;
             }
-        });
-        t.start();
+            if (angle > 360) {
+                angle = angle - 360;
+            } else if (angle > 0) {
+                angle = 360 - angle;
+            }
+            gyroTurning = true;
+            resetAngle();
+            final double leftfrontpower, leftbackpower, rightfrontpower, rightbackpower;
+            if (angle < 0) {
+                leftfrontpower = -power;
+                leftbackpower = -power;
+                rightfrontpower = power;
+                rightbackpower = power;
+            } else if (angle > 0) {
+                leftfrontpower = power;
+                leftbackpower = power;
+                rightfrontpower = -power;
+                rightbackpower = -power;
+            } else {
+                leftfrontpower = 0;
+                leftbackpower = 0;
+                rightfrontpower = 0;
+                rightbackpower = 0;
+            }
+            final int qangle = angle;
+            Thread t = new Thread(new Runnable() {
+                private volatile boolean running = true;
+                private final int requiredAngle = qangle;
+                @Override
+                public void run() {
+                    int i = 0;/*
+                    opmode.getLeftFrontDrive().setPower(leftfrontpower);
+                    opmode.getLeftBackDrive().setPower(leftbackpower);
+                    opmode.getRightFrontDrive().setPower(rightfrontpower);
+                    opmode.getRightBackDrive().setPower(rightbackpower);*/
+                    while (running) {
+                        if (opmode instanceof OpMode) {
+                            ((OpMode) opmode).telemetry.addData("difference", getRelativeAngle());
+                            ((OpMode) opmode).telemetry.addData("requiredAngle with correction", (requiredAngle - CORRECT_ANGLE_RANGE) + " to " + (requiredAngle + CORRECT_ANGLE_RANGE));
+                            ((OpMode) opmode).telemetry.addData("difference boolean", (getRelativeAngle() > requiredAngle + CORRECT_ANGLE_RANGE && getRelativeAngle() < requiredAngle - CORRECT_ANGLE_RANGE));
+                            ((OpMode) opmode).telemetry.addData("checked how many times:", i);
+                            ((OpMode) opmode).telemetry.update();
+                        }
+                        if (getRelativeAngle() > requiredAngle - CORRECT_ANGLE_RANGE && getRelativeAngle() < requiredAngle + CORRECT_ANGLE_RANGE) {
+                            running = false;
+                            /*
+                            opmode.getLeftFrontDrive().setPower(0);
+                            opmode.getLeftBackDrive().setPower(0);
+                            opmode.getRightFrontDrive().setPower(0);
+                            opmode.getRightBackDrive().setPower(0);
+                            */
+                            gyroTurning = false;
+                            return;
+                        }
+                        i++;
+                    }
+                }
+
+            });
+            ThreadManager.getInstance().addThread(t);
+            t.start();
+        }
     }
     /**
      * Reset the current angle to the current updated angle
@@ -175,9 +186,12 @@ public class RobotDriver {
         In relative to the current angle
         MUST BE CORRECTED
          */
-        return correctAngle(getAngle(false) -  correctAngle(getCurrentAngle()));
+        return correctAngle(correctAngle(getAngle()) -  correctAngle(getCurrentAngle()));
     }
 
+    public boolean IsGyroTurning(){
+        return gyroTurning;
+    }
     /**
      * Private constructor to prevent instantiating this utility class.
      */
@@ -186,6 +200,7 @@ public class RobotDriver {
     }
     /**
      * Get instance of this class (singleton)
+     * @return RobotDriver
      */
     public static RobotDriver getDriver(){
         if(driver == null) {

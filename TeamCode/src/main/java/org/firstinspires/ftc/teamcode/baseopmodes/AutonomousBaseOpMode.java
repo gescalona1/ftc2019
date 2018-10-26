@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesHardware {
     protected HardwareMap map;
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode(){
         telemetry.addData("Hardware Initialization:", "Not done");
         telemetry.update();
         hardwareInit();
@@ -30,6 +30,7 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
         prerun();
         waitForStart();
         run();
+        RobotDriver.getDriver().setHardwareMap(null);
     }
     protected abstract void prerun();
     protected abstract void run();

@@ -30,6 +30,14 @@ public final class HardwareMap {
     public void hardwareInit(Telemetry telemetry){
         cameraViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         //<editor-fold desc="DcMotorSetup">
+        motorInit();
+        //</editor-fold>
+        //<editor-fold desc="ImuConfiguration">
+        imuInit(telemetry);
+        //</editor-fold>
+    }
+
+    public void motorInit(){
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "LF");
         rightFrontDrive  = hardwareMap.get(DcMotor.class, "RF");
         leftBackDrive = hardwareMap.get(DcMotor.class, "LB");
@@ -44,8 +52,9 @@ public final class HardwareMap {
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        //</editor-fold>
-        //<editor-fold desc="ImuConfiguration">
+    }
+
+    public void imuInit(Telemetry telemetry){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
         parameters.mode                = BNO055IMU.SensorMode.IMU;
@@ -57,9 +66,12 @@ public final class HardwareMap {
         imu.initialize(parameters);
         //</editor-fold>
         synchronized (this){
+            int i = 0;
             while(!imu.isGyroCalibrated()) {
                 try {
-                    telemetry.addData("Gyro Calibrated:", imu.isGyroCalibrated());
+                    telemetry.addData(i + " Gyro Calibrated:", imu.isGyroCalibrated());
+                    telemetry.update();
+                    i++;
                     this.wait(50);
                 }catch (InterruptedException e){
                     e.printStackTrace();

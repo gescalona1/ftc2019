@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.baseopmodes.DriverBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
+import org.firstinspires.ftc.teamcode.util.ThreadManager;
 
 /**
  * Ultro
@@ -41,13 +42,19 @@ import org.firstinspires.ftc.teamcode.robot.RobotDriver;
  *
  * @version 1.0 10/11/2018
  */
-@TeleOp(name="Driver Op Mode", group="driver")
-public class DriverOpModeDriver extends DriverBaseOpMode {
+@TeleOp(name="Imu Driver Op Mode", group="driver")
+public class ImuTestOpModeDriver extends DriverBaseOpMode {
     // Declare OpMode members.
-    boolean last = false;
-    boolean current = false;
+    boolean gyroTurning = false;
 
 
+    @Override
+    public void init(){
+        map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
+        map.imuInit(telemetry);
+        RobotDriver.getDriver().setHardwareMap(this);
+        RobotDriver.getDriver().resetAngle();
+    }
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -93,6 +100,9 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
 
         double rightStickX = gamepad1.right_stick_x;
         //RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
+        if(gamepad1.a && !Main.getDriver().IsGyroTurning()){
+            Main.getDriver().gyroTurn(90, 0.5);
+        }
 
 
         // Tank Mode uses one stick to control each wheel.
@@ -120,6 +130,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
      */
     @Override
     public void stop() {
+        ThreadManager.getInstance().stopAll();
     }
 
 }

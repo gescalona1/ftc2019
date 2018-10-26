@@ -13,3 +13,7 @@ After cloning the repository, do these steps to add opencv to the dependencies:
 > File **>** Project Structure **>** Modules **>** "FtcRobotController" **>** Depndencies
 
 >Then add the opencv jar ("opencv-342.jar") into there and make sure to set it to "API" (by default it's implementation)
+
+# Resørces
+- Github cheatsheet: https://education.github.com/git-cheat-sheet-education.pdf
+- opencv documentation: https://opencv-java-tutorials.readthedocs.io/en/latest/
