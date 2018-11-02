@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Hardware;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.UsesHardware;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
@@ -86,6 +88,26 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     @Override
     public int getCameraViewId(){
         return map.getCameraViewId();
+    }
+
+    @Override
+    public VuforiaLocalizer getVuforia() {
+        return map.getVuforia();
+    }
+
+    @Override
+    public TFObjectDetector getTfod() {
+        return map.getTfod();
+    }
+
+    public String getTfodModelAsset() {
+        return map.getTfodModelAsset();
+    }
+    public String getLabelGoldMineral() {
+        return map.getLabelGoldMineral();
+    }
+    public String getLabelSilverMineral() {
+        return map.getLabelSilverMineral();
     }
 
 }

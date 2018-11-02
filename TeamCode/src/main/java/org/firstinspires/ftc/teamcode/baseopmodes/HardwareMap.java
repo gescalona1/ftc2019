@@ -3,7 +3,11 @@ package org.firstinspires.ftc.teamcode.baseopmodes;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.VARIABLES;
 
 /**
  * Ultro
@@ -27,6 +31,15 @@ public final class HardwareMap {
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
 
+    // Tensorflow
+    private final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    private final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    private final String LABEL_SILVER_MINERAL = "Silver Mineral";
+
+    private static final String VUFORIA_KEY = VARIABLES.VUFORIA_KEY;
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
+
     public void hardwareInit(Telemetry telemetry){
         cameraViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         //<editor-fold desc="DcMotorSetup">
@@ -34,6 +47,9 @@ public final class HardwareMap {
         //</editor-fold>
         //<editor-fold desc="ImuConfiguration">
         imuInit(telemetry);
+        //</editor-fold>
+        //<editor-fold desc="Tensor Flow configuration">
+        initCamera(telemetry);
         //</editor-fold>
     }
 
@@ -79,6 +95,35 @@ public final class HardwareMap {
             }
         }
     }
+
+    public void initCamera(Telemetry telemetry){
+        initVuforia();
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+    }
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
+    }
+
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+    }
+
     public DcMotor getLeftFrontDrive() {
         return leftFrontDrive;
     }
@@ -98,5 +143,21 @@ public final class HardwareMap {
 
     public int getCameraViewId(){
         return cameraViewId;
+    }
+    public VuforiaLocalizer getVuforia() {
+        return vuforia;
+    }
+    public TFObjectDetector getTfod() {
+        return tfod;
+    }
+
+    public String getTfodModelAsset() {
+        return TFOD_MODEL_ASSET;
+    }
+    public String getLabelGoldMineral() {
+        return LABEL_GOLD_MINERAL;
+    }
+    public String getLabelSilverMineral() {
+        return LABEL_SILVER_MINERAL;
     }
 }

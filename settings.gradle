@@ -1,2 +1,2 @@
-include ':FtcRobotController'
+include ':FtcRobotController', ':tfod-release', ':tensorflow-lite-0.0.0-nightly'
 include ':TeamCode'

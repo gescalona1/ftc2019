@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.UsesHardware;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
@@ -70,4 +72,25 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     public int getCameraViewId(){
         return map.getCameraViewId();
     }
+
+    @Override
+    public VuforiaLocalizer getVuforia() {
+        return map.getVuforia();
+    }
+
+    @Override
+    public TFObjectDetector getTfod() {
+        return map.getTfod();
+    }
+
+    public String getTfodModelAsset() {
+        return map.getTfodModelAsset();
+    }
+    public String getLabelGoldMineral() {
+        return map.getLabelGoldMineral();
+    }
+    public String getLabelSilverMineral() {
+        return map.getLabelSilverMineral();
+    }
+
 }
