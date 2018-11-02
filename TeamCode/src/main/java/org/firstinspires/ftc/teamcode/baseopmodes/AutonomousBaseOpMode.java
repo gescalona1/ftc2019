@@ -64,6 +64,9 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     }
 
     @Override
+    public DcMotor getLift() { return map.getLift(); }
+
+    @Override
     public BNO055IMU getImu() {
         return map.getImu();
     }

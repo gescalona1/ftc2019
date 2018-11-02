@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.baseopmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -30,6 +31,7 @@ public final class HardwareMap {
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor lift = null;
 
     // Tensorflow
     private final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -58,16 +60,21 @@ public final class HardwareMap {
         rightFrontDrive  = hardwareMap.get(DcMotor.class, "RF");
         leftBackDrive = hardwareMap.get(DcMotor.class, "LB");
         rightBackDrive = hardwareMap.get(DcMotor.class, "RB");
+        lift = hardwareMap.get(DcMotor.class, "lift");
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        lift.setDirection(DcMotor.Direction.FORWARD);
+
     }
 
     public void imuInit(Telemetry telemetry){
@@ -135,6 +142,9 @@ public final class HardwareMap {
     }
     public DcMotor getRightBackDrive() {
         return rightBackDrive;
+    }
+    public DcMotor getLift() {
+        return lift;
     }
 
     public BNO055IMU getImu() {

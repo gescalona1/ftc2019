@@ -68,11 +68,6 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
      */
     @Override
     public void start() {
-        synchronized (this){
-            telemetry.addData("gyro turning","Started");
-            RobotDriver.getDriver().gyroTurn(90, 0.2);
-            telemetry.addData("gyro turning", "ended");
-        }
         this.runtime.reset();
     }
 
@@ -92,7 +87,13 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         double leftStickX = gamepad1.left_stick_x;
 
         double rightStickX = gamepad1.right_stick_x;
-        //RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
+        RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
+        if(gamepad1.right_trigger > 0){
+            getLift().setPower(gamepad1.left_trigger);
+        }else {
+            getLift().setPower(-gamepad1.left_trigger/2);
+        }
+
 
 
         // Tank Mode uses one stick to control each wheel.

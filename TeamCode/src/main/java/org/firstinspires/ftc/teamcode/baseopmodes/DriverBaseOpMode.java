@@ -81,6 +81,9 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     }
 
     @Override
+    public DcMotor getLift() { return map.getLift(); }
+
+    @Override
     public BNO055IMU getImu() {
         return map.getImu();
     }

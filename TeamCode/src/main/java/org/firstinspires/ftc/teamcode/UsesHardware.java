@@ -20,6 +20,7 @@ public interface UsesHardware {
     DcMotor getRightFrontDrive();
     DcMotor getLeftBackDrive();
     DcMotor getRightBackDrive();
+    DcMotor getLift();
 
     BNO055IMU getImu();
 
