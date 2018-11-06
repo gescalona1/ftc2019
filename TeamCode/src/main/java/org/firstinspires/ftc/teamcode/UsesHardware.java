@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -21,6 +22,12 @@ public interface UsesHardware {
     DcMotor getLeftBackDrive();
     DcMotor getRightBackDrive();
     DcMotor getLift();
+    DcMotor getIntake();
+
+    DcMotor getRightpuldaun();
+    DcMotor getLeftpuldaun();
+
+    Servo getBucket();
 
     BNO055IMU getImu();
 

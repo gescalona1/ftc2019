@@ -27,12 +27,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes.driver;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Main;
 import org.firstinspires.ftc.teamcode.baseopmodes.DriverBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
+import org.firstinspires.ftc.teamcode.util.ThreadManager;
 
 /**
  * Ultro
@@ -41,13 +43,19 @@ import org.firstinspires.ftc.teamcode.robot.RobotDriver;
  *
  * @version 1.0 10/11/2018
  */
-@TeleOp(name="Driver Op Mode", group="driver")
-public class DriverOpModeDriver extends DriverBaseOpMode {
+@TeleOp(name="Imu Driver Op Mode", group="driver")
+public class ImuTestOpModeDriver extends DriverBaseOpMode {
     // Declare OpMode members.
-    boolean last = false;
-    boolean current = false;
+    boolean gyroTurning = false;
 
 
+    @Override
+    public void init(){
+        map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
+        map.imuInit(telemetry);
+        RobotDriver.getDriver().setHardwareMap(this);
+        RobotDriver.getDriver().resetAngle();
+    }
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -68,6 +76,11 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
      */
     @Override
     public void start() {
+        synchronized (this){
+            telemetry.addData("gyro turning","Started");
+            RobotDriver.getDriver().gyroTurn(90, 0.2);
+            telemetry.addData("gyro turning", "ended");
+        }
         this.runtime.reset();
     }
 
@@ -87,13 +100,10 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         double leftStickX = gamepad1.left_stick_x;
 
         double rightStickX = gamepad1.right_stick_x;
-        RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
-        if(gamepad1.right_trigger > 0){
-            getLift().setPower(gamepad1.left_trigger);
-        }else {
-            getLift().setPower(-gamepad1.left_trigger/2);
+        //RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
+        if(gamepad1.a && !Main.getDriver().IsGyroTurning()){
+            Main.getDriver().gyroTurn(90, 0.5);
         }
-
 
 
         // Tank Mode uses one stick to control each wheel.
@@ -121,6 +131,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
      */
     @Override
     public void stop() {
+        ThreadManager.getInstance().stopAll();
     }
 
 }
