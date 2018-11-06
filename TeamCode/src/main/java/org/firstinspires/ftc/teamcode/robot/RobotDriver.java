@@ -87,7 +87,7 @@ public class RobotDriver {
             }
             gyroTurning = true;
             resetAngle();
-            final double leftfrontpower, leftbackpower, rightfrontpower, rightbackpower;
+            double leftfrontpower = 0, leftbackpower = 0, rightfrontpower = 0, rightbackpower = 0;
             if (angle < 0) {
                 leftfrontpower = -power;
                 leftbackpower = -power;
@@ -98,23 +98,45 @@ public class RobotDriver {
                 leftbackpower = power;
                 rightfrontpower = -power;
                 rightbackpower = -power;
-            } else {
-                leftfrontpower = 0;
-                leftbackpower = 0;
-                rightfrontpower = 0;
-                rightbackpower = 0;
             }
             final int qangle = angle;
+            int i = 0;
+            opmode.getLeftFrontDrive().setPower(leftfrontpower);
+            opmode.getLeftBackDrive().setPower(leftbackpower);
+            opmode.getRightFrontDrive().setPower(rightfrontpower);
+            opmode.getRightBackDrive().setPower(rightbackpower);
+            while(true){
+                if (opmode instanceof OpMode) {
+                    ((OpMode) opmode).telemetry.addData("difference", getRelativeAngle());
+                    ((OpMode) opmode).telemetry.addData("requiredAngle with correction", (qangle - CORRECT_ANGLE_RANGE) + " to " + (qangle + CORRECT_ANGLE_RANGE));
+                    ((OpMode) opmode).telemetry.addData("difference boolean", (getRelativeAngle() > qangle + CORRECT_ANGLE_RANGE && getRelativeAngle() < qangle - CORRECT_ANGLE_RANGE));
+                    ((OpMode) opmode).telemetry.addData("checked how many times:", i);
+                    ((OpMode) opmode).telemetry.update();
+                }
+                if (getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE && getRelativeAngle() < qangle + CORRECT_ANGLE_RANGE) {
+                    opmode.getLeftFrontDrive().setPower(0);
+                    opmode.getLeftBackDrive().setPower(0);
+                    opmode.getRightFrontDrive().setPower(0);
+                    opmode.getRightBackDrive().setPower(0);
+                    gyroTurning = false;
+                    break;
+                }
+                if(i >= 1500) {
+                    break;
+                }
+                i++;
+            }
+            /*
             Thread t = new Thread(new Runnable() {
                 private volatile boolean running = true;
                 private final int requiredAngle = qangle;
                 @Override
                 public void run() {
-                    int i = 0;/*
+                    int i = 0;
                     opmode.getLeftFrontDrive().setPower(leftfrontpower);
                     opmode.getLeftBackDrive().setPower(leftbackpower);
                     opmode.getRightFrontDrive().setPower(rightfrontpower);
-                    opmode.getRightBackDrive().setPower(rightbackpower);*/
+                    opmode.getRightBackDrive().setPower(rightbackpower);
                     while (running) {
                         if (opmode instanceof OpMode) {
                             ((OpMode) opmode).telemetry.addData("difference", getRelativeAngle());
@@ -125,12 +147,10 @@ public class RobotDriver {
                         }
                         if (getRelativeAngle() > requiredAngle - CORRECT_ANGLE_RANGE && getRelativeAngle() < requiredAngle + CORRECT_ANGLE_RANGE) {
                             running = false;
-                            /*
                             opmode.getLeftFrontDrive().setPower(0);
                             opmode.getLeftBackDrive().setPower(0);
                             opmode.getRightFrontDrive().setPower(0);
                             opmode.getRightBackDrive().setPower(0);
-                            */
                             gyroTurning = false;
                             return;
                         }
@@ -140,7 +160,7 @@ public class RobotDriver {
 
             });
             ThreadManager.getInstance().addThread(t);
-            t.start();
+            t.start();*/
         }
     }
     /**

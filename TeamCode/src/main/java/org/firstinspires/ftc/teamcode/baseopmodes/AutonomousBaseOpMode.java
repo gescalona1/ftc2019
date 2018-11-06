@@ -33,6 +33,11 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
         waitForStart();
         run();
         RobotDriver.getDriver().setHardwareMap(null);
+        if(isStopRequested()){
+            if (getTfod() != null) {
+                getTfod().shutdown();
+            }
+        }
     }
     protected abstract void prerun();
     protected abstract void run();
