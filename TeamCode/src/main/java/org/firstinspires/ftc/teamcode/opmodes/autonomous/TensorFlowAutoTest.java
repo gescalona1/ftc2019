@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
+import org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
 import java.util.List;
@@ -15,23 +16,20 @@ import java.util.List;
  *
  * @version 1.0 10/11/2018
  */
-@Autonomous(name = "Autonomous", group = "auto")
-public class AutonomousMode extends AutonomousBaseOpMode {
+@Autonomous(name = "TAutonomous", group = "auto")
+public class TensorFlowAutoTest extends AutonomousBaseOpMode {
 
-    /*
-    Before waitforStart()
-     */
     @Override
-    protected void prerun() {
-        telemetry.addLine("Ready");
+    public void runOpMode(){
+        map = new HardwareMap(hardwareMap);
+        telemetry.addData("Hardware Initialization:", "Not done");
         telemetry.update();
-    }
-    /*
-    After waitForStart()
-     */
-    @Override
-    protected void run() {
-
+        map.initCamera(telemetry);
+        RobotDriver.getDriver().setHardwareMap(this);
+        telemetry.addData("Hardware Initialization:", "Finished");
+        telemetry.update();
+        prerun();
+        waitForStart();
         if (opModeIsActive()) {
             /** Activate Tensor Flow Object Detection. */
             if (getTfod() != null) {
@@ -59,23 +57,36 @@ public class AutonomousMode extends AutonomousBaseOpMode {
                             }
                             if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                                 if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                    //code for driving left
+                                    telemetry.addData("Gold Mineral Position", "Left");
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                    //code for driving right
+                                    telemetry.addData("Gold Mineral Position", "Right");
                                 } else {
-                                    //code for driving center
+                                    telemetry.addData("Gold Mineral Position", "Center");
                                 }
-                                break;
                             }
                         }
                         telemetry.update();
                     }
                 }
             }
-
-            if (getTfod() != null) {
-                getTfod().shutdown();
-            }
         }
+        if (getTfod() != null) {
+            getTfod().shutdown();
+        }
+        RobotDriver.getDriver().setHardwareMap(null);
+    }
+    /*
+    Before waitforStart()
+     */
+    @Override
+    protected void prerun() {
+
+    }
+    /*
+    After waitForStart()
+     */
+    @Override
+    protected void run() {
+
     }
 }

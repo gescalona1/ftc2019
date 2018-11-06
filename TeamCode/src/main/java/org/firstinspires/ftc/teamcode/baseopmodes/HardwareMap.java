@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode.baseopmodes;
 
+import android.graphics.Camera;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.sun.tools.javac.comp.DeferredAttr;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.VARIABLES;
@@ -32,6 +38,14 @@ public final class HardwareMap {
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
     private DcMotor lift = null;
+    private DcMotor intake = null;
+
+    private DcMotor rightpuldaun = null;
+    private DcMotor leftpuldaun = null;
+
+    private Servo buck = null;
+    private Servo open = null;
+    private Servo close = null;
 
     // Tensorflow
     private final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -41,12 +55,15 @@ public final class HardwareMap {
     private static final String VUFORIA_KEY = VARIABLES.VUFORIA_KEY;
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
+    private WebcamName webcamName;
 
     public void hardwareInit(Telemetry telemetry){
-        cameraViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        cameraViewId = hardwareMap.appContext.getResources().getIdentifier("9ED9A76F", "id", hardwareMap.appContext.getPackageName());
+        //cameraViewId = hardwareMap.appContext.getResources().getIdentifier("Webcam 1", "id", hardwareMap.appContext.getPackageName());
         //<editor-fold desc="DcMotorSetup">
         motorInit();
         //</editor-fold>
+        servoInit();
         //<editor-fold desc="ImuConfiguration">
         imuInit(telemetry);
         //</editor-fold>
@@ -62,21 +79,35 @@ public final class HardwareMap {
         rightBackDrive = hardwareMap.get(DcMotor.class, "RB");
         lift = hardwareMap.get(DcMotor.class, "lift");
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightpuldaun = hardwareMap.get(DcMotor.class, "RP");
+        leftpuldaun = hardwareMap.get(DcMotor.class, "LP");
+        intake = hardwareMap.get(DcMotor.class, "intake");
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         lift.setDirection(DcMotor.Direction.FORWARD);
+        intake.setDirection(DcMotor.Direction.FORWARD);
+        rightpuldaun.setDirection(DcMotor.Direction.FORWARD);
+        leftpuldaun.setDirection(DcMotor.Direction.REVERSE);
 
     }
 
+    public void servoInit(){
+        buck = hardwareMap.get(Servo.class, "bucket");
+        open = hardwareMap.get(Servo.class, "open");
+        close = hardwareMap.get(Servo.class, "close");
+    }
     public void imuInit(Telemetry telemetry){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -104,6 +135,7 @@ public final class HardwareMap {
     }
 
     public void initCamera(Telemetry telemetry){
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         initVuforia();
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod();
@@ -118,6 +150,8 @@ public final class HardwareMap {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        parameters.cameraName = webcamName;
+
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
         // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
@@ -147,6 +181,20 @@ public final class HardwareMap {
         return lift;
     }
 
+    public DcMotor getRightpuldaun() {
+        return rightpuldaun;
+    }
+    public DcMotor getLeftpuldaun() {
+        return leftpuldaun;
+    }
+
+    public Servo getOpen() {
+        return open;
+    }
+    public Servo getClose() {
+        return close;
+    }
+
     public BNO055IMU getImu() {
         return imu;
     }
@@ -160,6 +208,9 @@ public final class HardwareMap {
     public TFObjectDetector getTfod() {
         return tfod;
     }
+    public WebcamName getWebcamName() {
+        return webcamName;
+    }
 
     public String getTfodModelAsset() {
         return TFOD_MODEL_ASSET;
@@ -169,5 +220,13 @@ public final class HardwareMap {
     }
     public String getLabelSilverMineral() {
         return LABEL_SILVER_MINERAL;
+    }
+
+    public DcMotor getIntake() {
+        return intake;
+    }
+
+    public Servo getBucket() {
+        return buck;
     }
 }

@@ -1,10 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
-import org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
 import java.util.List;
@@ -16,20 +15,31 @@ import java.util.List;
  *
  * @version 1.0 10/11/2018
  */
-@Autonomous(name = "TAutonomous", group = "auto")
-public class TensorFlowAutoTest extends AutonomousBaseOpMode {
-
+@Autonomous(name = "Main Autonomous", group = "auto")
+public class AutonomousMode extends AutonomousBaseOpMode {
+    RobotDriver driver = RobotDriver.getDriver();
+    /*
+    Before waitforStart()
+     */
     @Override
-    public void runOpMode(){
-        map = new HardwareMap(hardwareMap);
-        telemetry.addData("Hardware Initialization:", "Not done");
+    protected void prerun() {
+        telemetry.addLine("Ready");
         telemetry.update();
-        map.initCamera(telemetry);
-        RobotDriver.getDriver().setHardwareMap(this);
-        telemetry.addData("Hardware Initialization:", "Finished");
-        telemetry.update();
-        prerun();
-        waitForStart();
+    }
+    /*
+    After waitForStart()
+     */
+    @Override
+    protected void run() {
+        driver.extendPullDownBar(6, 1);
+        driver.openBar();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                driver.closeBar();
+                driver.extendPullDownBar(-6, 1);
+            }
+        }).start();
         if (opModeIsActive()) {
             /** Activate Tensor Flow Object Detection. */
             if (getTfod() != null) {
@@ -56,37 +66,34 @@ public class TensorFlowAutoTest extends AutonomousBaseOpMode {
                                 }
                             }
                             if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
+                                String position;
                                 if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                    telemetry.addData("Gold Mineral Position", "Left");
+                                    //code for driving left
+                                    position = "Left";
+                                    driver.mechanumDriveLeft(4, 1);
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                    telemetry.addData("Gold Mineral Position", "Right");
+                                    //code for driving right
+                                    position = "Right";
+                                    driver.mechanumDriveRight(4, 1);
                                 } else {
-                                    telemetry.addData("Gold Mineral Position", "Center");
+                                    position = "Center";
+                                    //code for driving center
+
                                 }
+                                telemetry.addData("Gold Mineral Position", position);
+                                break;
                             }
                         }
                         telemetry.update();
                     }
                 }
             }
+            driver.mechanumDriveForward(1);
+            sleep(5 * 1000);
+            driver.mechanumDriveForward(0);
+            if (getTfod() != null) {
+                getTfod().shutdown();
+            }
         }
-        if (getTfod() != null) {
-            getTfod().shutdown();
-        }
-        RobotDriver.getDriver().setHardwareMap(null);
-    }
-    /*
-    Before waitforStart()
-     */
-    @Override
-    protected void prerun() {
-
-    }
-    /*
-    After waitForStart()
-     */
-    @Override
-    protected void run() {
-
     }
 }

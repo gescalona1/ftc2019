@@ -27,13 +27,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes.driver;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.baseopmodes.DriverBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
-import org.firstinspires.ftc.teamcode.util.ThreadManager;
 
 /**
  * Ultro
@@ -42,19 +41,13 @@ import org.firstinspires.ftc.teamcode.util.ThreadManager;
  *
  * @version 1.0 10/11/2018
  */
-@TeleOp(name="Imu Driver Op Mode", group="driver")
-public class ImuTestOpModeDriver extends DriverBaseOpMode {
+@TeleOp(name="Driver Op Mode", group="driver")
+public class DriverOpModeDriver extends DriverBaseOpMode {
     // Declare OpMode members.
-    boolean gyroTurning = false;
+    boolean last = false;
+    boolean current = false;
+    double pos;
 
-
-    @Override
-    public void init(){
-        map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
-        map.imuInit(telemetry);
-        RobotDriver.getDriver().setHardwareMap(this);
-        RobotDriver.getDriver().resetAngle();
-    }
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -75,11 +68,6 @@ public class ImuTestOpModeDriver extends DriverBaseOpMode {
      */
     @Override
     public void start() {
-        synchronized (this){
-            telemetry.addData("gyro turning","Started");
-            RobotDriver.getDriver().gyroTurn(90, 0.2);
-            telemetry.addData("gyro turning", "ended");
-        }
         this.runtime.reset();
     }
 
@@ -99,12 +87,34 @@ public class ImuTestOpModeDriver extends DriverBaseOpMode {
         double leftStickX = gamepad1.left_stick_x;
 
         double rightStickX = gamepad1.right_stick_x;
-        //RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
-        if(gamepad1.a && !Main.getDriver().IsGyroTurning()){
-            Main.getDriver().gyroTurn(90, 0.5);
+        RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
+        if(gamepad1.right_trigger > 0){
+            getLift().setPower(gamepad1.left_trigger);
+        }else {
+            getLift().setPower(-gamepad1.left_trigger/2);
         }
-
-
+        if(gamepad1.y || gamepad2.y){
+            pos = 0;
+        }else if(gamepad1.a || gamepad2.a){
+            pos = 1;
+        }else if(gamepad1.x || gamepad1.b || gamepad2.x || gamepad2.b){
+            pos = 0.6;
+        }
+        this.getBucket().setPosition(pos);
+        if(gamepad1.right_trigger > 0){
+            getRightpuldaun().setPower(gamepad1.right_trigger);
+            getLeftpuldaun().setPower(gamepad1.right_trigger);
+        }else {
+            getRightpuldaun().setPower(-gamepad1.left_trigger);
+            getLeftpuldaun().setPower(-gamepad1.left_trigger);
+        }
+        if(gamepad2.dpad_down){
+            getIntake().setPower(1);
+        }else if(gamepad2.dpad_up){
+            getIntake().setPower(-1);
+        }else if(gamepad2.dpad_left){
+            getIntake().setPower(0);
+        }
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward slowly and keep straight.
         // leftPower  = -gamepad1.left_stick_y ;
@@ -130,7 +140,6 @@ public class ImuTestOpModeDriver extends DriverBaseOpMode {
      */
     @Override
     public void stop() {
-        ThreadManager.getInstance().stopAll();
     }
 
 }

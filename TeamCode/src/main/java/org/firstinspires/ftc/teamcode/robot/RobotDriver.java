@@ -1,19 +1,14 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.UsesHardware;
-import org.firstinspires.ftc.teamcode.VARIABLES;
-import org.firstinspires.ftc.teamcode.util.RobotThread;
-import org.firstinspires.ftc.teamcode.util.ThreadManager;
 
 /**
  * Ultro
@@ -30,6 +25,17 @@ public class RobotDriver {
     private final double CORRECT_ANGLE_RANGE = 2.5;
     private Orientation currentAngle;
 
+    private final double  BAR_COUNTS_PER_MOTOR_REV  =    1120;
+    private final double  BAR_DRIVE_GEAR_REDUCTION  =   0.945;
+    private final double  BAR_WHEEL_DIAMETER_INCHES =   2.717;
+    private final double  BAR_COUNTS_PER_INCH       =   BAR_COUNTS_PER_MOTOR_REV * (BAR_DRIVE_GEAR_REDUCTION/BAR_WHEEL_DIAMETER_INCHES)
+                                                        / (Math.PI*4);
+
+    private final double DRIVE_COUNTS_PER_MOTOR_HEX  =    1120;
+    private final double DRIVE_DRIVE_GEAR_REDUCTION  =   0.945;
+    private final double DRIVE_WHEEL_DIAMETER_INCHES =   2.717;
+    private final double DRIVE_COUNTS_PER_INCH       =   DRIVE_COUNTS_PER_MOTOR_HEX * (DRIVE_DRIVE_GEAR_REDUCTION/DRIVE_WHEEL_DIAMETER_INCHES)
+                                                         / (Math.PI*4);
     /**
      * Updated mecanum drive function this year (math is ? ?? ? )
      * @param left_stick_x gamepadleftX
@@ -70,6 +76,157 @@ public class RobotDriver {
         opmode.getLeftBackDrive().setPower(v3);
         opmode.getRightBackDrive().setPower(v4);
     }
+
+    public void mechanumDriveForward(int speed){
+        //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
+        DcMotor leftBack = opmode.getLeftBackDrive();
+        DcMotor leftFront = opmode.getLeftFrontDrive();
+        DcMotor rightBack = opmode.getRightBackDrive();
+        DcMotor rightFront = opmode.getRightFrontDrive();
+        //</editor-fold>
+        //<editor-fold desc="Setting Power to speed">
+        leftBack.setPower(speed);
+        rightFront.setPower(speed);
+        leftFront.setPower(speed);
+        rightBack.setPower(speed);
+        //</editor-fold>
+    }
+    public void mechanumDriveRight(int inches, int speed){
+        //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
+        DcMotor leftBack = opmode.getLeftBackDrive();
+        DcMotor leftFront = opmode.getLeftFrontDrive();
+        DcMotor rightBack = opmode.getRightBackDrive();
+        DcMotor rightFront = opmode.getRightFrontDrive();
+        //</editor-fold>
+        int newleftBackTarget = leftBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightFrontTarget = rightFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newleftFrontTarget = leftFront.getCurrentPosition() + -(int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightBackTarget = rightBack.getCurrentPosition() + -(int)(inches * DRIVE_COUNTS_PER_INCH);
+        //<editor-fold desc="Setting to RUN_TO_POSITION">
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //</editor-fold>
+        //<editor-fold desc="Setting Target Positions">
+        leftBack.setTargetPosition(newleftBackTarget);
+        leftFront.setTargetPosition(newleftFrontTarget);
+        rightBack.setTargetPosition(newrightBackTarget);
+        rightFront.setTargetPosition(newrightFrontTarget);
+        //</editor-fold>
+        //<editor-fold desc="Setting Power">
+        leftBack.setPower(-speed);
+        rightFront.setPower(-speed);
+        leftFront.setPower(speed);
+        rightBack.setPower(speed);
+        //</editor-fold>
+        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
+            if(opmode instanceof OpMode){
+                ((OpMode) opmode).telemetry.addData("Speed", speed);
+                ((OpMode) opmode).telemetry.addData("Currently going:", "right");
+            }
+        }
+        //<editor-fold desc="Setting Power to 0">
+        leftBack.setPower(0);
+        rightFront.setPower(0);
+        leftFront.setPower(0);
+        rightBack.setPower(0);
+        //</editor-fold>
+        //<editor-fold desc="Setting to RUN_WITHOUT_ENCODER">
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //</editor-fold>
+    }
+
+    public void mechanumDriveLeft(int inches, int speed){
+        //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
+        DcMotor leftBack = opmode.getLeftBackDrive();
+        DcMotor leftFront = opmode.getLeftFrontDrive();
+        DcMotor rightBack = opmode.getRightBackDrive();
+        DcMotor rightFront = opmode.getRightFrontDrive();
+        //</editor-fold>
+        int newleftBackTarget = leftBack.getCurrentPosition() + -(int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightFrontTarget = rightFront.getCurrentPosition() + -(int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newleftFrontTarget = leftFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightBackTarget = rightBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        //<editor-fold desc="Setting to RUN_TO_POSITION">
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //</editor-fold>
+        //<editor-fold desc="Setting Target Positions">
+        leftBack.setTargetPosition(newleftBackTarget);
+        leftFront.setTargetPosition(newleftFrontTarget);
+        rightBack.setTargetPosition(newrightBackTarget);
+        rightFront.setTargetPosition(newrightFrontTarget);
+        //</editor-fold>
+        //<editor-fold desc="Setting Power">
+        leftBack.setPower(speed);
+        rightFront.setPower(speed);
+        leftFront.setPower(-speed);
+        rightBack.setPower(-speed);
+        //</editor-fold>
+        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
+            if(opmode instanceof OpMode){
+                ((OpMode) opmode).telemetry.addData("Speed", speed);
+                ((OpMode) opmode).telemetry.addData("Currently going:", "left");
+            }
+        }
+        //<editor-fold desc="Setting Power to 0">
+        leftBack.setPower(0);
+        rightFront.setPower(0);
+        leftFront.setPower(0);
+        rightBack.setPower(0);
+        //</editor-fold>
+        //<editor-fold desc="Setting to RUN_WITHOUT_ENCODER">
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //</editor-fold>
+    }
+
+    public void extendPullDownBar(int inches, int speed){
+        int newLeftTarget = opmode.getLeftpuldaun().getCurrentPosition() + (int)(inches * BAR_COUNTS_PER_INCH);
+        int newRightTarget = opmode.getRightpuldaun().getCurrentPosition() + (int)(inches * BAR_COUNTS_PER_INCH);
+
+        opmode.getLeftpuldaun().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        opmode.getLeftpuldaun().setTargetPosition(newLeftTarget);
+        opmode.getRightpuldaun().setTargetPosition(newRightTarget);
+        speed = Math.abs(speed);
+
+        opmode.getLeftpuldaun().setPower(speed);
+        opmode.getRightpuldaun().setPower(speed);
+        while(opmode.getLeftpuldaun().isBusy() && opmode.getRightpuldaun().isBusy()){
+            if(opmode instanceof OpMode){
+                ((OpMode) opmode).telemetry.addData("Current Position Left :", opmode.getLeftpuldaun().getCurrentPosition());
+                ((OpMode) opmode).telemetry.addData("Current Position Right:", opmode.getRightpuldaun().getCurrentPosition());
+                ((OpMode) opmode).telemetry.addData("Expected Position Left :", newLeftTarget);
+                ((OpMode) opmode).telemetry.addData("Expected Position Right:", newRightTarget);
+            }
+        }
+        opmode.getLeftpuldaun().setPower(0);
+        opmode.getRightpuldaun().setPower(0);
+
+        opmode.getLeftpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void openBar(){
+        opmode.getOpen().setPosition(1);
+        opmode.getClose().setPosition(0.46);
+    }
+
+    public void closeBar(){
+        opmode.getOpen().setPosition(0.7);
+        opmode.getClose().setPosition(0);
+    }
+
     /**
      * Turns the machine using the built in imu, uses a thread to constantly check if the correct angle is met
      * @param angle required angle to rotate [-180, 180]

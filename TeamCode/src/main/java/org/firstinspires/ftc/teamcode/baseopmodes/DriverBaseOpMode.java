@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Hardware;
 
@@ -80,8 +81,38 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
         return map.getRightBackDrive();
     }
 
+
+    @Override
+    public DcMotor getRightpuldaun() {
+        return map.getRightpuldaun();
+    }
+    @Override
+    public DcMotor getLeftpuldaun() {
+        return map.getLeftpuldaun();
+    }
+
+    @Override
+    public DcMotor getIntake() {
+        return map.getIntake();
+    }
+
     @Override
     public DcMotor getLift() { return map.getLift(); }
+
+    @Override
+    public Servo getOpen() {
+        return map.getOpen();
+    }
+
+    @Override
+    public Servo getClose() {
+        return map.getClose();
+    }
+
+    @Override
+    public Servo getBucket() {
+        return map.getBucket();
+    }
 
     @Override
     public BNO055IMU getImu() {
