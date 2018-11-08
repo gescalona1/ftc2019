@@ -44,8 +44,6 @@ public final class HardwareMap {
     private DcMotor leftpuldaun = null;
 
     private Servo buck = null;
-    private Servo open = null;
-    private Servo close = null;
 
     // Tensorflow
     private final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -105,8 +103,6 @@ public final class HardwareMap {
 
     public void servoInit(){
         buck = hardwareMap.get(Servo.class, "bucket");
-        open = hardwareMap.get(Servo.class, "open");
-        close = hardwareMap.get(Servo.class, "close");
     }
     public void imuInit(Telemetry telemetry){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -186,13 +182,6 @@ public final class HardwareMap {
     }
     public DcMotor getLeftpuldaun() {
         return leftpuldaun;
-    }
-
-    public Servo getOpen() {
-        return open;
-    }
-    public Servo getClose() {
-        return close;
     }
 
     public BNO055IMU getImu() {
