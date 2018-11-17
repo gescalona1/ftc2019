@@ -119,6 +119,7 @@ public class DriverOpModeDriverWithExperimentalControls extends DriverBaseOpMode
             lastgyro_spin = true;
             new Thread(() -> {
                 RobotDriver.getDriver().gyroTurn(-90, 0.7);
+                telemetry.addLine("Spinning left");
                 lastgyro_spin = false;
             }).start();
         }
@@ -126,6 +127,7 @@ public class DriverOpModeDriverWithExperimentalControls extends DriverBaseOpMode
             lastgyro_spin = true;
             new Thread(() -> {
                 RobotDriver.getDriver().gyroTurn(90, 0.7);
+                telemetry.addLine("Spinning Right");
                 lastgyro_spin = false;
             }).start();
         }
@@ -133,6 +135,7 @@ public class DriverOpModeDriverWithExperimentalControls extends DriverBaseOpMode
             lastgyro_spin = true;
             new Thread(() -> {
                 RobotDriver.getDriver().gyroTurn(180, 1);
+                telemetry.addLine("Spinning 180");
                 lastgyro_spin = false;
             }).start();
         }
@@ -140,9 +143,12 @@ public class DriverOpModeDriverWithExperimentalControls extends DriverBaseOpMode
             lastgyro_spin = true;
             new Thread(() -> {
                 RobotDriver.getDriver().gyroTurn(10, 1);
+                telemetry.addLine("Spinning 10 degrees to the right");
                 lastgyro_spin = false;
             }).start();
         }
+        telemetry.addData("IsSpinning?", lastgyro_spin);
+        telemetry.update();
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward slowly and keep straight.
         // leftPower  = -gamepad1.left_stick_y ;

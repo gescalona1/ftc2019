@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode.opmodes.driver;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.baseopmodes.DriverBaseOpMode;
@@ -69,6 +70,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
     @Override
     public void start() {
         this.runtime.reset();
+        SoundPlayer.getInstance().stopPlayingAll();
     }
 
     /*
@@ -88,10 +90,12 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
 
         double rightStickX = gamepad1.right_stick_x;
         RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
-        if(gamepad1.right_trigger > 0){
-            getLift().setPower(gamepad1.left_trigger);
-        }else {
-            getLift().setPower(-gamepad1.left_trigger/2);
+        if(gamepad2.right_trigger > 0){
+            getLift().setPower(gamepad2.left_trigger);
+        }else if(gamepad2.right_trigger > 0) {
+            getLift().setPower(-gamepad2.left_trigger/2);
+        }else{
+            getLift().setPower(0);
         }
         if(gamepad1.y || gamepad2.y){
             pos = 0;
@@ -139,7 +143,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
      * Code to run ONCE after the driver hits STOP
      */
     @Override
-    public void stop() {
+    public void stopb() {
     }
 
 }

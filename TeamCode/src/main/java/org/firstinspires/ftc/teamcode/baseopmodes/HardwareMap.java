@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.baseopmodes;
 
 import android.graphics.Camera;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -44,6 +45,11 @@ public final class HardwareMap {
     private DcMotor leftpuldaun = null;
 
     private Servo buck = null;
+    private Servo marker = null;
+    int rickSoundID;
+    boolean rickFound;
+    int ussrSoundID;
+    boolean ussrFound;
 
     // Tensorflow
     private final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -68,12 +74,18 @@ public final class HardwareMap {
         //<editor-fold desc="Tensor Flow configuration">
         initCamera(telemetry);
         //</editor-fold>
+        telemetry.addLine("Setting up sound");
+        telemetry.update();
+        initSound();
+        telemetry.addLine("Finished up sound");
+        telemetry.update();
     }
 
     public void driverhardwareinit(Telemetry telemetry){
         motorInit();
         servoInit();
         imuInit(telemetry);
+        initSound();
     }
 
     public void motorInit(){
@@ -109,6 +121,7 @@ public final class HardwareMap {
 
     public void servoInit(){
         buck = hardwareMap.get(Servo.class, "bucket");
+        marker = hardwareMap.get(Servo.class, "marker");
     }
     public void imuInit(Telemetry telemetry){
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -167,6 +180,15 @@ public final class HardwareMap {
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
 
+    public void initSound(){
+        /*
+        ussrSoundID = hardwareMap.appContext.getResources().getIdentifier("ussr_theme", "raw", hardwareMap.appContext.getPackageName());
+        rickSoundID = hardwareMap.appContext.getResources().getIdentifier("ricka", "raw", hardwareMap.appContext.getPackageName());
+
+        if(rickSoundID != 0) rickFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, rickSoundID);
+        if(ussrSoundID != 0) ussrFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, ussrSoundID);
+        */
+    }
     public final DcMotor getLeftFrontDrive() {
         return leftFrontDrive;
     }
@@ -223,5 +245,24 @@ public final class HardwareMap {
 
     public final Servo getBucket() {
         return buck;
+    }
+
+    public final Servo getMarker() {
+        return marker;
+    }
+
+    public boolean playRick(){
+        if (rickFound) {
+            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, rickSoundID);
+            return true;
+        }
+        return false;
+    }
+    public boolean playUSSR(){
+        if (ussrFound) {
+            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, rickSoundID);
+            return true;
+        }
+        return false;
     }
 }

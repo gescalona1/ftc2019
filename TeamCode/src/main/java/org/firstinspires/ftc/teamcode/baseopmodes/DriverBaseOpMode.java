@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.baseopmodes;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -28,7 +29,6 @@ import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     protected ElapsedTime runtime = new ElapsedTime();
     protected org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap map;
-
 
     @Override
     public void init() {
@@ -64,7 +64,16 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     @Override
     public void hardwareInit(){
         map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
-        map.driverhardwareinit(telemetry);
+        map.hardwareInit(telemetry);
+    }
+
+    @Override
+    public boolean playRick(){
+        return map.playRick();
+    }
+    @Override
+    public boolean playUSSR(){
+        return map.playUSSR();
     }
 
     @Override
@@ -108,6 +117,11 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     @Override
     public final Servo getBucket() {
         return map.getBucket();
+    }
+
+    @Override
+    public final Servo getMarker() {
+        return map.getMarker();
     }
 
     @Override

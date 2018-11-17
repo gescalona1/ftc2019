@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
@@ -17,6 +18,7 @@ import java.util.List;
  *
  * @version 1.0 10/11/2018
  */
+@Disabled
 @Autonomous(name = "Main Autonomous", group = "auto")
 public class AutonomousMode extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
@@ -44,20 +46,6 @@ public class AutonomousMode extends AutonomousBaseOpMode {
      */
     @Override
     protected void run() {
-        driver.extendPullDownBar(6, 0.8);
-        sleep(1000);
-        driver.mecanumDriveRight(1, 0.5);
-        sleep(1000);
-        new Thread(() -> {
-            driver.extendPullDownBar(-6, 0.5);
-            while(opModeIsActive()){
-                if (getTfod() != null) {
-                    getTfod().shutdown();
-                }
-            }
-        }).start();
-        driver.mecanumDriveForward(1, 0.5);
-        sleep(1000);
         List<Position> positions = new ArrayList<>();
         while (opModeIsActive()) {
             if (getTfod() != null) {
@@ -93,29 +81,40 @@ public class AutonomousMode extends AutonomousBaseOpMode {
                             positions.add(position);
                             telemetry.addData("Gold Mineral Position", position.toString());
                             break;
-                            /*
-                            if(positions.size() == CHECKS){
-                                try {
-                                    for(Position p : positions){
-                                        if(p == positions.get(positions.indexOf(p) + 1)){
-                                            telemetry.addData("Increments of checks for gold Mineral Position: " + p.toString(),
-                                                                        positions.indexOf(p));
-                                            telemetry.update();
-                                        }else{
-                                            positions.clear();
-                                        }
+                        /*
+                        if(positions.size() == CHECKS){
+                            try {
+                                for(Position p : positions){
+                                    if(p == positions.get(positions.indexOf(p) + 1)){
+                                        telemetry.addData("Increments of checks for gold Mineral Position: " + p.toString(),
+                                                                    positions.indexOf(p));
+                                        telemetry.update();
+                                    }else{
+                                        positions.clear();
                                     }
-                                }catch (ArrayIndexOutOfBoundsException e) {
-                                    break;
                                 }
-                            }*/
+                            }catch (ArrayIndexOutOfBoundsException e) {
+                                break;
+                            }
+                        }*/
                         }
                     }
                     telemetry.update();
                 }
             }
         }
-        sleep(750);
+        driver.extendPullDownBar(9, 0.8);
+        driver.mecanumDriveRight(3, 0.5);
+        new Thread(() -> {
+            driver.extendPullDownBar(-9, 0.7);
+            while(opModeIsActive()){
+                if (getTfod() != null) {
+                    getTfod().shutdown();
+                }
+            }
+        }).start();
+        driver.mecanumDriveForward(2, 0.5);
+
         switch(position){
             case LEFT:
                 driver.mecanumDriveLeft(2, 0.5);
@@ -130,10 +129,18 @@ public class AutonomousMode extends AutonomousBaseOpMode {
                 break;
         }
         telemetry.update();
+        driver.mecanumDriveForward(1, 1);
+        driver.mecanumDriveBackward(1, 1);
+        driver.gyroTurn(180, 1);
+        driver.mecanumDriveRight(10, 1);
+        driver.gyroTurn(30, 1);
         driver.mecanumDriveForward(1);
-        sleep(1500);
+        sleep(3000);
         driver.mecanumDriveForward(0);
-
+        driver.mecanumDriveRight(3, 1);
+        driver.mecanumDriveBackward(1);
+        sleep(6000);
+        driver.mecanumDriveBackward(0);
         /*
         if (opModeIsActive()) {
 

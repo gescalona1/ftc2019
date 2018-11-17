@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.baseopmodes;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -25,6 +26,7 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     public void runOpMode(){
         telemetry.addData("Hardware Initialization:", "Not done");
         telemetry.update();
+
         hardwareInit();
         RobotDriver.getDriver().setHardwareMap(this);
         RobotDriver.getDriver().resetAngle();
@@ -49,7 +51,14 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
         map = new HardwareMap(hardwareMap);
         map.hardwareInit(telemetry);
     }
-
+    @Override
+    public boolean playRick(){
+        return map.playRick();
+    }
+    @Override
+    public boolean playUSSR(){
+        return map.playUSSR();
+    }
     @Override
     public final DcMotor getLeftFrontDrive() {
         return map.getLeftFrontDrive();
@@ -93,6 +102,10 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
         return map.getBucket();
     }
 
+    @Override
+    public final Servo getMarker() {
+        return map.getMarker();
+    }
     @Override
     public final BNO055IMU getImu() {
         return map.getImu();

@@ -28,7 +28,7 @@ public interface UsesHardware {
     DcMotor getLeftpuldaun();
 
     Servo getBucket();
-
+    Servo getMarker();
     BNO055IMU getImu();
 
     int getCameraViewId();
@@ -38,4 +38,7 @@ public interface UsesHardware {
     String getTfodModelAsset();
     String getLabelGoldMineral();
     String getLabelSilverMineral();
+
+    boolean playRick();
+    boolean playUSSR();
 }

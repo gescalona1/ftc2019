@@ -29,8 +29,13 @@
 
 package org.firstinspires.ftc.teamcode.opmodes.driver;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Main;
 import org.firstinspires.ftc.teamcode.baseopmodes.DriverBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
@@ -43,6 +48,7 @@ import org.firstinspires.ftc.teamcode.util.ThreadManager;
  *
  * @version 1.0 10/11/2018
  */
+@Disabled
 @TeleOp(name="Imu Driver Op Mode", group="driver")
 public class ImuTestOpModeDriver extends DriverBaseOpMode {
     // Declare OpMode members.
@@ -78,7 +84,6 @@ public class ImuTestOpModeDriver extends DriverBaseOpMode {
     public void start() {
         synchronized (this){
             telemetry.addData("gyro turning","Started");
-            RobotDriver.getDriver().gyroTurn(90, 0.2);
             telemetry.addData("gyro turning", "ended");
         }
         this.runtime.reset();
@@ -101,9 +106,15 @@ public class ImuTestOpModeDriver extends DriverBaseOpMode {
 
         double rightStickX = gamepad1.right_stick_x;
         //RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
-        if(gamepad1.a && !Main.getDriver().IsGyroTurning()){
-            Main.getDriver().gyroTurn(90, 0.5);
-        }
+
+        RobotDriver driver = RobotDriver.getDriver();
+        Orientation ZYX_angles = getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        Orientation XYZ_angles = getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+        Orientation YZX_angles = getImu().getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.YZX, AngleUnit.DEGREES);
+        telemetry.addData("ZYX", ZYX_angles.firstAngle);
+        telemetry.addData("XYZ", XYZ_angles.firstAngle);
+        telemetry.addData("YZX", YZX_angles.firstAngle);
+        telemetry.update();
 
 
         // Tank Mode uses one stick to control each wheel.
@@ -130,7 +141,7 @@ public class ImuTestOpModeDriver extends DriverBaseOpMode {
      * Code to run ONCE after the driver hits STOP
      */
     @Override
-    public void stop() {
+    public void stopb() {
         ThreadManager.getInstance().stopAll();
     }
 

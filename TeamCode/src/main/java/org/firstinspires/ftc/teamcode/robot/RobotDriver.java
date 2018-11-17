@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -20,16 +21,17 @@ import org.firstinspires.ftc.teamcode.UsesHardware;
 public class RobotDriver {
     private static volatile RobotDriver driver = null;
     private UsesHardware opmode;
+    private Telemetry telemetry;
     private boolean gyroTurning = false;
 
     private final double CORRECT_ANGLE_RANGE = 2.5;
     private Orientation currentAngle;
 
-    private final double  BAR_COUNTS_PER_MOTOR_REV  =    1120;
-    private final double  BAR_DRIVE_GEAR_REDUCTION  =   0.945;
-    private final double  BAR_WHEEL_DIAMETER_INCHES =   2.717;
+    private final double  BAR_COUNTS_PER_MOTOR_REV  =    2240;
+    private final double  BAR_DRIVE_GEAR_REDUCTION  =   1;
+    private final double  BAR_WHEEL_DIAMETER_INCHES =   1.326;
     private final double  BAR_COUNTS_PER_INCH       =   BAR_COUNTS_PER_MOTOR_REV * (BAR_DRIVE_GEAR_REDUCTION/BAR_WHEEL_DIAMETER_INCHES)
-                                                        / (Math.PI*4);
+                                                        / (Math.PI);
 
     private final double DRIVE_COUNTS_PER_MOTOR_HEX  =    1120;
     private final double DRIVE_DRIVE_GEAR_REDUCTION  =   0.945;
@@ -98,12 +100,6 @@ public class RobotDriver {
         DcMotor rightBack = opmode.getRightBackDrive();
         DcMotor rightFront = opmode.getRightFrontDrive();
         //</editor-fold>
-        //<editor-fold desc="Setting Power to speed">
-        leftBack.setPower(speed);
-        rightFront.setPower(speed);
-        leftFront.setPower(speed);
-        rightBack.setPower(speed);
-        //</editor-fold>
         if(inches < 0){
             speed *= -1;
         }
@@ -111,6 +107,12 @@ public class RobotDriver {
         int newrightFrontTarget = rightFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
         int newleftFrontTarget =   leftFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
         int newrightBackTarget =   rightBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        //<editor-fold desc="Setting to RUN_TO_POSITION">
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //</editor-fold>
         //<editor-fold desc="Setting Target Positions">
         leftBack.setTargetPosition(newleftBackTarget);
         leftFront.setTargetPosition(newleftFrontTarget);
@@ -124,9 +126,8 @@ public class RobotDriver {
         rightBack.setPower(speed);
         //</editor-fold>
         while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
-            if(opmode instanceof OpMode){
-                ((OpMode) opmode).telemetry.addData("Speed", speed);
-            }
+                telemetry.addData("Speed", speed);
+                telemetry.update();
         }
         //<editor-fold desc="Setting Power to 0">
         leftBack.setPower(0);
@@ -182,9 +183,12 @@ public class RobotDriver {
         rightBack.setPower(speed);
         //</editor-fold>
         while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
-            if(opmode instanceof OpMode){
-                ((OpMode) opmode).telemetry.addData("Speed", speed);
-            }
+                telemetry.addData("newleftBackTarget", newleftBackTarget);
+                telemetry.addData("newleftBackTarget", newrightFrontTarget);
+                telemetry.addData("newleftBackTarget", newleftFrontTarget);
+                telemetry.addData("newleftBackTarget", newrightBackTarget);
+                telemetry.addData("Speed", speed);
+                telemetry.update();
         }
         //<editor-fold desc="Setting Power to 0">
         leftBack.setPower(0);
@@ -203,13 +207,15 @@ public class RobotDriver {
         mecanumDriveLeft(-inches, speed);
     }
 
-    public void extendPullDownBar(int inches, double speed){
+    public void extendPullDownBar(double inches, double speed){
         //<editor-fold desc="Motors: newLeftTarget, newRightTarget">
-        int newLeftTarget = opmode.getLeftpuldaun().getCurrentPosition() + (int)(inches * BAR_COUNTS_PER_INCH);
-        int newRightTarget = opmode.getRightpuldaun().getCurrentPosition() + (int)(inches * BAR_COUNTS_PER_INCH);
+        int newLeftTarget = opmode.getLeftpuldaun().getCurrentPosition() + (int)((inches * BAR_COUNTS_PER_INCH));
+        int newRightTarget = opmode.getRightpuldaun().getCurrentPosition() + (int)((inches * BAR_COUNTS_PER_INCH));
         //</editor-fold>
+        //<editor-fold desc="Setting to RUN_TO_POSITION">
         opmode.getLeftpuldaun().setMode(DcMotor.RunMode.RUN_TO_POSITION);
         opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //</editor-fold>
         //<editor-fold desc="Setting Target Positions">
         opmode.getLeftpuldaun().setTargetPosition(newLeftTarget);
         opmode.getRightpuldaun().setTargetPosition(newRightTarget);
@@ -221,12 +227,15 @@ public class RobotDriver {
         opmode.getLeftpuldaun().setPower(speed);
         opmode.getRightpuldaun().setPower(speed);
         //</editor-fold>
+        double pastTime = ((OpMode) opmode).getRuntime();
         while(opmode.getLeftpuldaun().isBusy() && opmode.getRightpuldaun().isBusy()){
-            if(opmode instanceof OpMode){
-                ((OpMode) opmode).telemetry.addData("Current Position Left :", opmode.getLeftpuldaun().getCurrentPosition());
-                ((OpMode) opmode).telemetry.addData("Current Position Right:", opmode.getRightpuldaun().getCurrentPosition());
-                ((OpMode) opmode).telemetry.addData("Expected Position Left :", newLeftTarget);
-                ((OpMode) opmode).telemetry.addData("Expected Position Right:", newRightTarget);
+            telemetry.addData("Current Position Left :", opmode.getLeftpuldaun().getCurrentPosition());
+            telemetry.addData("Current Position Right:", opmode.getRightpuldaun().getCurrentPosition());
+            telemetry.addData("Expected Position Left :", newLeftTarget);
+            telemetry.addData("Expected Position Right:", newRightTarget);
+            telemetry.update();
+            if(((OpMode) opmode).getRuntime() - pastTime >= 9){
+                break;
             }
         }
         //<editor-fold desc="Setting Power to 0">
@@ -251,8 +260,11 @@ public class RobotDriver {
             }
             if (angle > 360) {
                 angle = angle - 360;
+                gyroTurn(angle, power);
             } else if (angle > 0) {
                 angle = 360 - angle;
+            }else if(angle < 0){
+                angle = Math.abs(angle);
             }
             gyroTurning = true;
             resetAngle();
@@ -269,32 +281,34 @@ public class RobotDriver {
                 rightbackpower = -power;
             }
             final int qangle = angle;
-            int i = 0;
             opmode.getLeftFrontDrive().setPower(leftfrontpower);
             opmode.getLeftBackDrive().setPower(leftbackpower);
             opmode.getRightFrontDrive().setPower(rightfrontpower);
             opmode.getRightBackDrive().setPower(rightbackpower);
-            while(true){
-                if (opmode instanceof OpMode) {
-                    ((OpMode) opmode).telemetry.addData("difference", getRelativeAngle());
-                    ((OpMode) opmode).telemetry.addData("requiredAngle with correction", (qangle - CORRECT_ANGLE_RANGE) + " to " + (qangle + CORRECT_ANGLE_RANGE));
-                    ((OpMode) opmode).telemetry.addData("difference boolean", (getRelativeAngle() > qangle + CORRECT_ANGLE_RANGE && getRelativeAngle() < qangle - CORRECT_ANGLE_RANGE));
-                    ((OpMode) opmode).telemetry.addData("checked how many times:", i);
-                    ((OpMode) opmode).telemetry.update();
-                }
-                if (getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE && getRelativeAngle() < qangle + CORRECT_ANGLE_RANGE) {
-                    opmode.getLeftFrontDrive().setPower(0);
-                    opmode.getLeftBackDrive().setPower(0);
-                    opmode.getRightFrontDrive().setPower(0);
-                    opmode.getRightBackDrive().setPower(0);
-                    gyroTurning = false;
-                    break;
-                }
+            int i = 0;
+            /*
+            if qangle = 90
+            102.5 > relativeangle of 90 > 77.5 == true
+            true = while loop breaks
+            false = while loop still goes
+             */
+            while(!(qangle + CORRECT_ANGLE_RANGE > getRelativeAngle() && getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE)){
+                telemetry.addData("continue", !(qangle + CORRECT_ANGLE_RANGE > getRelativeAngle() && getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE));
+                telemetry.addData("relative angle", getRelativeAngle());
+                telemetry.addData("requiredAngle with correction", (qangle - CORRECT_ANGLE_RANGE) + " to " + (qangle + CORRECT_ANGLE_RANGE));
+                telemetry.addData("difference actual", Math.abs(getRelativeAngle() - qangle));
+                telemetry.addData("checked how many times:", i);
+                telemetry.update();
                 if(i >= 1500) {
                     break;
                 }
                 i++;
             }
+            opmode.getLeftFrontDrive().setPower(0);
+            opmode.getLeftBackDrive().setPower(0);
+            opmode.getRightFrontDrive().setPower(0);
+            opmode.getRightBackDrive().setPower(0);
+            gyroTurning = false;
             /*
             Thread t = new Thread(new Runnable() {
                 private volatile boolean running = true;
@@ -414,6 +428,9 @@ public class RobotDriver {
         THIS MUST BE DONE
          */
         this.opmode = opMode;
+        if(opMode instanceof OpMode){
+            this.telemetry = ((OpMode) opmode).telemetry;
+        }
 
     }
 }
