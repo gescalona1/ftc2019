@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.finalop;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
@@ -16,6 +17,7 @@ import java.util.List;
  *
  * @version 1.0 10/11/2018
  */
+@Disabled
 @Autonomous(name = "CraterFrontAuto", group = "auto")
 public class CraterFrontAuto extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
@@ -28,6 +30,7 @@ public class CraterFrontAuto extends AutonomousBaseOpMode {
         telemetry.addLine("Finding Orientation of the gold mineral");
         telemetry.update();
         getBucket().setPosition(0.5);
+        getMarker().setPosition(0.7);
         resetStartTime();
     }
     /*
@@ -54,9 +57,9 @@ public class CraterFrontAuto extends AutonomousBaseOpMode {
         driver.mecanumDriveRight(9, 1);
         driver.mecanumDriveForward(24, 1);
 
-        getMarker().setPosition(0); // ????
+        getMarker().setPosition(0.45); // ????
         new Thread(() -> {
-            getMarker().setPosition(0.5); // ???
+            getMarker().setPosition(0.7); // ???
         }).start();
 
         driver.mecanumDriveBackward(3, 1);

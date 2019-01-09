@@ -1,14 +1,11 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.finalop.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 import org.firstinspires.ftc.teamcode.util.Position;
-
-import java.util.List;
 
 /**
  * Ultro
@@ -18,8 +15,8 @@ import java.util.List;
  * @version 1.0 10/11/2018
  */
 @Disabled
-@Autonomous(name = "Main Autonomous with Teammark", group = "auto")
-public class AutonomousTeamMarker extends AutonomousBaseOpMode {
+@Autonomous(name = "Gyro Turn Test", group = "auto")
+public class GyroTurnTest extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
     /*
@@ -40,18 +37,7 @@ public class AutonomousTeamMarker extends AutonomousBaseOpMode {
      */
     @Override
     protected void run() {
-        driver.mecanumDriveForward(3, 0.5);
-        driver.mecanumDriveForward(-3, 0.5);
-        telemetry.addData("Elapsed Time", this.getRuntime());
-        telemetry.update();
-        driver.mecanumDriveLeft(18, 1);
-        sleep(3000);
         driver.gyroTurn(180,0.45);
-        driver.gyroTurn(40,0.45);
-        driver.mecanumDriveRight(4, 1);
-        driver.mecanumDriveForward(16, 1);
-        sleep(3000);
-        driver.mecanumDriveBackward(20,1);
         /*
         if (opModeIsActive()) {
 

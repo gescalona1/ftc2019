@@ -24,7 +24,6 @@ public class RobotDriver {
     private Telemetry telemetry;
     private boolean gyroTurning = false;
 
-    private final double CORRECT_ANGLE_RANGE = 2.5;
     private Orientation currentAngle;
 
     private final double  BAR_COUNTS_PER_MOTOR_REV  =    2240;
@@ -253,21 +252,11 @@ public class RobotDriver {
      * @param angle required angle to rotate [-180, 180]
      * @param power how much speed will the robot move
      */
-    public void gyroTurn(int angle, double power){
+    public void gyroTurn(float angle, double power, final double CORRECT_ANGLE_RANGE){
         if(!gyroTurning) {
             if (angle == 0) {
                 return;
             }
-            if (angle > 360) {
-                angle = angle - 360;
-                gyroTurn(angle, power);
-            } else if (angle > 0) {
-                angle = 360 - angle;
-            }else if(angle < 0){
-                angle = Math.abs(angle);
-            }
-            gyroTurning = true;
-            resetAngle();
             double leftfrontpower = 0, leftbackpower = 0, rightfrontpower = 0, rightbackpower = 0;
             if (angle < 0) {
                 leftfrontpower = -power;
@@ -280,7 +269,18 @@ public class RobotDriver {
                 rightfrontpower = -power;
                 rightbackpower = -power;
             }
-            final int qangle = angle;
+
+            if (angle > 360) {
+                angle = angle - 360;
+                gyroTurn(angle, power);
+            } else if (angle > 0) {
+                angle = 360 - angle;
+            }else if(angle < 0){
+                angle = Math.abs(angle);
+            }
+            gyroTurning = true;
+            resetAngle();
+            final int qangle = (int) angle;
             opmode.getLeftFrontDrive().setPower(leftfrontpower);
             opmode.getLeftBackDrive().setPower(leftbackpower);
             opmode.getRightFrontDrive().setPower(rightfrontpower);
@@ -345,6 +345,9 @@ public class RobotDriver {
             ThreadManager.getInstance().addThread(t);
             t.start();*/
         }
+    }
+    public void gyroTurn(float angle, double power){
+        this.gyroTurn(angle, power, 2.5);
     }
     /**
      * Reset the current angle to the current updated angle

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.finalop.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -18,8 +18,8 @@ import java.util.List;
  * @version 1.0 10/11/2018
  */
 @Disabled
-@Autonomous(name = "Main Autonomous without pullbar", group = "auto")
-public class AutonomousWithoutPullbarMode extends AutonomousBaseOpMode {
+@Autonomous(name = "Main Autonomous with pullbar and sampling", group = "auto")
+public class AutonomousWithPullbarandSampling extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
     /*
@@ -66,26 +66,23 @@ public class AutonomousWithoutPullbarMode extends AutonomousBaseOpMode {
                                 //code for driving center
                             }
                             telemetry.addData("Gold Mineral Position", currentPosition.toString());
+                            position = currentPosition;
                             break;
                         }
                     }
+                    telemetry.addLine("Ready, press init!");
                     telemetry.update();
                 }
             }
         }
+        resetStartTime();
     }
     /*
     After waitForStart()
      */
     @Override
     protected void run() {
-        new Thread(() -> {
-                while(opModeIsActive()){
-                    if (getTfod() != null) {
-                        getTfod().shutdown();
-                    }
-                }
-        }).start();
+        Position lastPos;
         while (opModeIsActive()) {
             if (getTfod() != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
@@ -109,42 +106,77 @@ public class AutonomousWithoutPullbarMode extends AutonomousBaseOpMode {
                         if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                             if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
                                 //code for driving left
-                                position = Position.LEFT;
+                                lastPos = Position.LEFT;
                             } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                                 //code for driving right
-                                position = Position.RIGHT;
+                                lastPos = Position.RIGHT;
                             } else {
-                                position = Position.CENTER;
+                                lastPos = Position.CENTER;
                                 //code for driving center
                             }
                             telemetry.addData("Gold Mineral Position", position.toString());
-                            break;
+                            if(lastPos != null && position == lastPos) {
+                                telemetry.addLine("Accurate.");
+                                telemetry.update();
+                                break;
+                            }
                         }
+                    }
+                    if(this.getRuntime() >= 7){
+                        telemetry.addLine("Breaking");
+                        int randomInt = (int) Math.floor(Math.random() * 3);
+                        switch(randomInt) {
+                            case 0:
+                                position = Position.LEFT;
+                            case 1:
+                                position = Position.CENTER;
+                            case 2:
+                                position = Position.RIGHT;
+                        }
+                        break;
                     }
                     telemetry.update();
                 }
             }
         }
-        driver.mecanumDriveForward(0.25);
-        sleep(750);
-        driver.mecanumDriveForward(0);
+        driver.extendPullDownBar(6.1, 0.8);
+        driver.mecanumDriveForward(3, 0.7);
+        new Thread(() -> {
+            driver.extendPullDownBar(-5, 1);
+            if (getTfod() != null) {
+                getTfod().shutdown();
+            }
+        }).start();
         switch(this.position){
             case LEFT:
                 telemetry.addLine("Going LEFT");
                 driver.mecanumDriveLeft(6, 0.7);
                 sleep(500);
-                driver.gyroTurn(15, 0.5);
+                break;
             case RIGHT:
                 telemetry.addLine("Going RIGHT");
                 driver.mecanumDriveRight(6, 0.7);
                 sleep(500);
-                driver.gyroTurn(-15, 0.5);
+                break;
             case CENTER:
                 telemetry.addLine("Going CENTER");
                 sleep(500);
+                break;
         }
         telemetry.update();
-        driver.mecanumDriveForward(12, 0.5);
+
+        driver.mecanumDriveForward(7, 0.5);
+        driver.mecanumDriveForward(-3, 0.5);
+        telemetry.addData("Elapsed Time", this.getRuntime());
+        telemetry.update();
+        driver.mecanumDriveLeft(18, 1);
+        sleep(3000);
+        driver.gyroTurn(180,0.45);
+        driver.gyroTurn(40,0.45);
+        driver.mecanumDriveRight(3, 1);
+        driver.mecanumDriveForward(16, 1);
+        sleep(3000);
+        driver.mecanumDriveBackward(20,1);
         /*
         if (opModeIsActive()) {
 

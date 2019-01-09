@@ -91,8 +91,8 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         double rightStickX = gamepad1.right_stick_x;
         RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
         if(gamepad2.right_trigger > 0){
-            getLift().setPower(gamepad2.left_trigger);
-        }else if(gamepad2.right_trigger > 0) {
+            getLift().setPower(gamepad2.right_trigger);
+        }else if(gamepad2.left_trigger > 0) {
             getLift().setPower(-gamepad2.left_trigger/2);
         }else{
             getLift().setPower(0);
@@ -118,6 +118,12 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
             getIntake().setPower(-1);
         }else if(gamepad2.dpad_left){
             getIntake().setPower(0);
+        }
+
+        if(gamepad1.dpad_up){
+            getMarker().setPosition(0.7);
+        }else if(gamepad1.dpad_down){
+            getMarker().setPosition(0.45);
         }
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward slowly and keep straight.

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous.finalop;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
@@ -16,7 +17,8 @@ import java.util.List;
  *
  * @version 1.0 10/11/2018
  */
-@Autonomous(name = "TeamMarkerFrontAutoColor", group = "auto")
+@Disabled
+@Autonomous(name = "TeamMarkerFrontAuto COLOR", group = "auto")
 public class TeamMarkerFrontAutoColor extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
@@ -28,6 +30,7 @@ public class TeamMarkerFrontAutoColor extends AutonomousBaseOpMode {
         telemetry.addLine("Finding Orientation of the gold mineral");
         telemetry.update();
         getBucket().setPosition(0.5);
+        getMarker().setPosition(0.7);
         if (getTfod() != null) {
             getTfod().activate();
         }
@@ -73,6 +76,7 @@ public class TeamMarkerFrontAutoColor extends AutonomousBaseOpMode {
             }
         }
         resetStartTime();
+
     }
     /*
     After waitForStart()
@@ -141,39 +145,41 @@ public class TeamMarkerFrontAutoColor extends AutonomousBaseOpMode {
                 }
             }
         }
-
         driver.extendPullDownBar(6.2, 0.8);
-        driver.mecanumDriveRight(10, 0.7);
+        driver.mecanumDriveRight(3, 0.7);
         new Thread(() -> {
             driver.extendPullDownBar(-5, 1);
-            if (getTfod() != null) {
-                getTfod().shutdown();
-            }
         }).start();
-        driver.gyroTurn(25, 0.45);
         driver.mecanumDriveForward(3, 0.7);
+        float adjustment = (driver.getAngle() < 0 && driver.getAngle() != 0 ) ? -driver.getAngle() : -driver.getAngle();
+        telemetry.addData("adjustment", adjustment);
+        telemetry.update();
+        //driver.gyroTurn(adjustment, 0.40);
         switch(this.position){
             case LEFT:
                 telemetry.addLine("Going LEFT");
                 driver.mecanumDriveLeft(6, 0.7);
+                sleep(500);
                 break;
             case RIGHT:
                 telemetry.addLine("Going RIGHT");
                 driver.mecanumDriveRight(6, 0.7);
+                sleep(500);
                 break;
             case CENTER:
                 telemetry.addLine("Going CENTER");
+                sleep(500);
                 break;
         }
-        telemetry.update();
-        driver.mecanumDriveForward(23, 0.7);
-        driver.mecanumDriveRight(12, 1);
-        driver.mecanumDriveBackward(2, 1);
-        //getMarker().setPosition(0); // ????
-        new Thread(() -> {
-            //getMarker().setPosition(0.5); // ???
-        }).start();
-        driver.mecanumDriveBackward(55,1);
+        driver.mecanumDriveForward(18, 0.7);
+        driver.mecanumDriveRight(18, 0.7);
+        driver.mecanumDriveForward(9, 0.7);
+        driver.mecanumDriveBackward(2, 0.7);
+        sleep(500);
+        getMarker().setPosition(0.45); // ????
+        sleep(2000);
+        getMarker().setPosition(0.7);
+        driver.mecanumDriveBackward(36,1);
         /*
         if (opModeIsActive()) {
 

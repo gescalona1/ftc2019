@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous.finalop;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.finalop.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.util.Position;
  *
  * @version 1.0 10/11/2018
  */
-@Autonomous(name = "Sample AUTO", group = "auto")
-public class SampleAuto extends AutonomousBaseOpMode {
+@Autonomous(name = "Sample TURN AUTO", group = "auto")
+public class SAMPLEAUTOTurn extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
     /*
@@ -22,14 +22,18 @@ public class SampleAuto extends AutonomousBaseOpMode {
      */
     @Override
     protected void prerun() {
-        getBucket().setPosition(0.5);
+        getMarker().setPosition(0.7);
         resetStartTime();
+        while(!isStarted()){
+            telemetry.addData("getAngle", driver.getAngle());
+            telemetry.update();
+        }
     }
     /*
     After waitForStart()
      */
     @Override
     protected void run() {
-        driver.gyroTurn(15, 0.45); // needs testing
+        driver.mecanumDriveLeft(10,1);
     }
 }

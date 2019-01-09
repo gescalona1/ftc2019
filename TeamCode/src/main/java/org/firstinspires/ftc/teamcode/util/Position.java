@@ -5,18 +5,14 @@ package org.firstinspires.ftc.teamcode.util;
  */
 
 public enum Position {
-    LEFT, CENTER, RIGHT;
+    LEFT("LEFT"), CENTER("CENTER"), RIGHT("RIGHT");
 
+    private String name;
+    Position(String name){
+        this.name = name;
+    }
     @Override
     public String toString() {
-        switch (this){
-            case LEFT:
-                return "LEFT";
-            case CENTER:
-                return "CENTER";
-            case RIGHT:
-                return "RIGHT";
-        }
-        return null;
+        return name;
     }
 }

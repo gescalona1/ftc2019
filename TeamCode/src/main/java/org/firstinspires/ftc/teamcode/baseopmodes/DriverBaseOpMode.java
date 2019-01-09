@@ -34,7 +34,6 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     public void init() {
         hardwareInit();
         RobotDriver.getDriver().setHardwareMap(this);
-        RobotDriver.getDriver().resetAngle();
         inita();
         initb();
     }
@@ -64,7 +63,7 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     @Override
     public void hardwareInit(){
         map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
-        map.hardwareInit(telemetry);
+        map.driverhardwareinit(telemetry);
     }
 
     @Override

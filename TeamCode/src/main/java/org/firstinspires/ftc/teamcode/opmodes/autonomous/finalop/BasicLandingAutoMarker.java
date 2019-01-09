@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.util.Position;
  *
  * @version 1.0 10/11/2018
  */
-@Autonomous(name = "TeamMarkerFront", group = "auto")
-public class TeamMarkerFrontAuto extends AutonomousBaseOpMode {
+@Autonomous(name = "BasicLandingAuto (Marker front)", group = "auto")
+public class BasicLandingAutoMarker extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
     /*
@@ -24,8 +24,6 @@ public class TeamMarkerFrontAuto extends AutonomousBaseOpMode {
     protected void prerun() {
         getBucket().setPosition(0.5);
         getMarker().setPosition(0.7);
-        telemetry.addLine("Finding Orientation of the gold mineral");
-        telemetry.update();
         resetStartTime();
     }
     /*
@@ -33,28 +31,21 @@ public class TeamMarkerFrontAuto extends AutonomousBaseOpMode {
      */
     @Override
     protected void run() {
-        driver.extendPullDownBar(6.2, 0.7);
-        driver.mecanumDriveRight(4, 0.7);
-        getIntake().setPower(0.9);
+        getIntake().setPower(1);
+        driver.extendPullDownBar(6.1, 0.8);
+        driver.mecanumDriveRight(3, 0.7);
         new Thread(() -> {
             driver.extendPullDownBar(-5, 1);
         }).start();
-        driver.mecanumDriveForward(9, 0.7);
-        //driver.gyro
-        //                  ```````Turn(-15, 0.45);
-        sleep(250);
-        driver.mecanumDriveRight(22, 0.7);
-        sleep(250);
-        driver.mecanumDriveForward(20, 0.7);
-        sleep(250);
-        driver.mecanumDriveBackward(2, 0.7);
-        driver.mecanumDriveRight(4, 0.7);
-        getIntake().setPower(0);
-        sleep(250);
-        getMarker().setPosition(0.45); // ????
+        driver.mecanumDriveForward(17, 1);
+        driver.mecanumDriveLeft(7, 0.7);
+        driver.mecanumDriveForward(3,0.7);
+        driver.mecanumDriveBackward(3,0.7);
+        getMarker().setPosition(0.45);
         sleep(2000);
         getMarker().setPosition(0.7);
-        driver.mecanumDriveBackward(35,1);
+        driver.mecanumDriveBackward(4, 0.7);
+        getIntake().setPower(0);
         /*
         if (opModeIsActive()) {
 

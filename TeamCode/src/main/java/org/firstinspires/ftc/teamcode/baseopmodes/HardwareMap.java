@@ -59,11 +59,10 @@ public final class HardwareMap {
     private static final String VUFORIA_KEY = VARIABLES.VUFORIA_KEY;
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
+    private int cameraMonitorViewId;
     private WebcamName webcamName;
 
     public void hardwareInit(Telemetry telemetry){
-        cameraViewId = hardwareMap.appContext.getResources().getIdentifier("9ED9A76F", "id", hardwareMap.appContext.getPackageName());
-        //cameraViewId = hardwareMap.appContext.getResources().getIdentifier("Webcam 1", "id", hardwareMap.appContext.getPackageName());
         //<editor-fold desc="DcMotorSetup">
         motorInit();
         //</editor-fold>
@@ -76,7 +75,7 @@ public final class HardwareMap {
         //</editor-fold>
         telemetry.addLine("Setting up sound");
         telemetry.update();
-        initSound();
+        //initSound();
         telemetry.addLine("Finished up sound");
         telemetry.update();
     }
@@ -84,8 +83,6 @@ public final class HardwareMap {
     public void driverhardwareinit(Telemetry telemetry){
         motorInit();
         servoInit();
-        imuInit(telemetry);
-        initSound();
     }
 
     public void motorInit(){
@@ -93,8 +90,15 @@ public final class HardwareMap {
         rightFrontDrive  = hardwareMap.get(DcMotor.class, "RF");
         leftBackDrive = hardwareMap.get(DcMotor.class, "LB");
         rightBackDrive = hardwareMap.get(DcMotor.class, "RB");
+
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         lift = hardwareMap.get(DcMotor.class, "lift");
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         rightpuldaun = hardwareMap.get(DcMotor.class, "RP");
         leftpuldaun = hardwareMap.get(DcMotor.class, "LP");
         intake = hardwareMap.get(DcMotor.class, "intake");
@@ -150,7 +154,8 @@ public final class HardwareMap {
     }
 
     public void initCamera(Telemetry telemetry){
-        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        //webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         initVuforia();
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod();
@@ -162,10 +167,10 @@ public final class HardwareMap {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        parameters.cameraName = webcamName;
+        //parameters.cameraName = webcamName;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -181,13 +186,13 @@ public final class HardwareMap {
     }
 
     public void initSound(){
-        /*
+
         ussrSoundID = hardwareMap.appContext.getResources().getIdentifier("ussr_theme", "raw", hardwareMap.appContext.getPackageName());
         rickSoundID = hardwareMap.appContext.getResources().getIdentifier("ricka", "raw", hardwareMap.appContext.getPackageName());
 
         if(rickSoundID != 0) rickFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, rickSoundID);
         if(ussrSoundID != 0) ussrFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, ussrSoundID);
-        */
+
     }
     public final DcMotor getLeftFrontDrive() {
         return leftFrontDrive;
@@ -264,5 +269,9 @@ public final class HardwareMap {
             return true;
         }
         return false;
+    }
+
+    public void stopPlayingAllSounds(){
+        SoundPlayer.getInstance().stopPlayingAll();
     }
 }

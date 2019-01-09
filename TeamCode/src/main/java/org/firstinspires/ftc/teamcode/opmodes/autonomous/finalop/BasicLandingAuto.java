@@ -41,7 +41,7 @@ public class BasicLandingAuto extends AutonomousBaseOpMode {
                 getTfod().shutdown();
             }
         }).start();
-        driver.mecanumDriveForward(12, 1);
+        driver.mecanumDriveForward(5, 1);
         /*
         if (opModeIsActive()) {
 

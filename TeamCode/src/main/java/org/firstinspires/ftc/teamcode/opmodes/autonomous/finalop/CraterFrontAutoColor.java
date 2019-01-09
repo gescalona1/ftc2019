@@ -30,6 +30,7 @@ public class CraterFrontAutoColor extends AutonomousBaseOpMode {
         telemetry.addLine("Finding Orientation of the gold mineral");
         telemetry.update();
         getBucket().setPosition(0.5);
+        getMarker().setPosition(0.7);
         if (getTfod() != null) {
             getTfod().activate();
         }
@@ -151,7 +152,8 @@ public class CraterFrontAutoColor extends AutonomousBaseOpMode {
                 getTfod().shutdown();
             }
         }).start();
-        driver.gyroTurn(25, 0.45);
+        float adjustment = (driver.getAngle() < 0 && driver.getAngle() != 0 ) ? -driver.getAngle() : -driver.getAngle();
+        driver.gyroTurn(adjustment, 0.40);
         driver.mecanumDriveForward(2, 0.5);
         switch(this.position){
             case LEFT:
@@ -181,9 +183,9 @@ public class CraterFrontAutoColor extends AutonomousBaseOpMode {
         driver.mecanumDriveRight(4, 1);
         driver.mecanumDriveForward(26, 1);
         driver.mecanumDriveBackward(3,1);
-        //getMarker().setPosition(0); // ????
+        getMarker().setPosition(0.45); // ????
         new Thread(() -> {
-            //getMarker().setPosition(0.5); // ???
+            getMarker().setPosition(0.7); // ???
         }).start();
         driver.mecanumDriveBackward(55,1);
         /*
