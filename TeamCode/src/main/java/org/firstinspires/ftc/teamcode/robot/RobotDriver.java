@@ -217,15 +217,6 @@ public class RobotDriver {
         opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void openBar(){
-        opmode.getOpen().setPosition(1);
-        opmode.getClose().setPosition(0.46);
-    }
-
-    public void closeBar(){
-        opmode.getOpen().setPosition(0.7);
-        opmode.getClose().setPosition(0);
-    }
 
     /**
      * Turns the machine using the built in imu, uses a thread to constantly check if the correct angle is met

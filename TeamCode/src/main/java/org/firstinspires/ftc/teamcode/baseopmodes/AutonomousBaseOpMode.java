@@ -89,15 +89,6 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     public DcMotor getLift() { return map.getLift(); }
 
     @Override
-    public Servo getOpen() {
-        return map.getOpen();
-    }
-    @Override
-    public Servo getClose() {
-        return map.getClose();
-    }
-
-    @Override
     public Servo getBucket() {
         return map.getBucket();
     }
@@ -131,5 +122,4 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     public String getLabelSilverMineral() {
         return map.getLabelSilverMineral();
     }
-
 }

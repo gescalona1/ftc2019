@@ -70,6 +70,16 @@ public final class HardwareMap {
         //</editor-fold>
     }
 
+    public void driverHardwareInit(Telemetry telemetry){
+        //<editor-fold desc="DcMotorSetup">
+        motorInit();
+        //</editor-fold>
+        servoInit();
+        //<editor-fold desc="ImuConfiguration">
+        imuInit(telemetry);
+        //</editor-fold>
+    }
+
     public void motorInit(){
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "LF");
         rightFrontDrive  = hardwareMap.get(DcMotor.class, "RF");

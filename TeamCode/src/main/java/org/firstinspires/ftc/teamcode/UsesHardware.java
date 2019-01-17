@@ -27,8 +27,6 @@ public interface UsesHardware {
     DcMotor getRightpuldaun();
     DcMotor getLeftpuldaun();
 
-    Servo getOpen();
-    Servo getClose();
     Servo getBucket();
 
     BNO055IMU getImu();

@@ -32,11 +32,9 @@ public class AutonomousMode extends AutonomousBaseOpMode {
     @Override
     protected void run() {
         driver.extendPullDownBar(6, 1);
-        driver.openBar();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                driver.closeBar();
                 driver.extendPullDownBar(-6, 1);
             }
         }).start();
