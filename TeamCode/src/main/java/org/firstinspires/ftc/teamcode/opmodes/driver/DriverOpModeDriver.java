@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode.opmodes.driver;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.baseopmodes.DriverBaseOpMode;
@@ -69,6 +70,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
     @Override
     public void start() {
         this.runtime.reset();
+        SoundPlayer.getInstance().stopPlayingAll();
     }
 
     /*
@@ -88,6 +90,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
 
         double rightStickX = gamepad1.right_stick_x;
         RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
+<<<<<<< HEAD:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/opmodes/driver/DriverOpModeDriver.java
         if(gamepad1.right_bumper){
             getRightpuldaun().setPower(0.5);
             getLeftpuldaun().setPower(0.5);
@@ -126,6 +129,43 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
 
 
 
+=======
+        if(gamepad2.right_trigger > 0){
+            getLift().setPower(gamepad2.right_trigger);
+        }else if(gamepad2.left_trigger > 0) {
+            getLift().setPower(-gamepad2.left_trigger/2);
+        }else{
+            getLift().setPower(0);
+        }
+        if(gamepad1.y || gamepad2.y){
+            pos = 0;
+        }else if(gamepad1.a || gamepad2.a){
+            pos = 1;
+        }else if(gamepad1.x || gamepad1.b || gamepad2.x || gamepad2.b){
+            pos = 0.6;
+        }
+        this.getBucket().setPosition(pos);
+        if(gamepad1.right_trigger > 0){
+            getRightpuldaun().setPower(gamepad1.right_trigger);
+            getLeftpuldaun().setPower(gamepad1.right_trigger);
+        }else {
+            getRightpuldaun().setPower(-gamepad1.left_trigger);
+            getLeftpuldaun().setPower(-gamepad1.left_trigger);
+        }
+        if(gamepad2.dpad_down){
+            getIntake().setPower(1);
+        }else if(gamepad2.dpad_up){
+            getIntake().setPower(-1);
+        }else if(gamepad2.dpad_left){
+            getIntake().setPower(0);
+        }
+
+        if(gamepad1.dpad_up){
+            getMarker().setPosition(0.7);
+        }else if(gamepad1.dpad_down){
+            getMarker().setPosition(0.45);
+        }
+>>>>>>> 682450fc4cab78de012be13d76cce6d6eb04e7da:TeamCode/src/main/java/org/firstinspires/ftc/teamcode/opmodes/driver/DriverOpModeDriver.java
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward slowly and keep straight.
         // leftPower  = -gamepad1.left_stick_y ;
@@ -150,7 +190,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
      * Code to run ONCE after the driver hits STOP
      */
     @Override
-    public void stop() {
+    public void stopb() {
     }
 
 }

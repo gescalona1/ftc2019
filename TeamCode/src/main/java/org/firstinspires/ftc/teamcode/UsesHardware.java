@@ -21,6 +21,7 @@ public interface UsesHardware {
     DcMotor getRightFrontDrive();
     DcMotor getLeftBackDrive();
     DcMotor getRightBackDrive();
+<<<<<<< HEAD
     DcMotor getRotate();
     DcMotor getExtend();
 
@@ -28,7 +29,16 @@ public interface UsesHardware {
     DcMotor getLeftpuldaun();
 
     Servo getIntake();
+=======
+    DcMotor getLift();
+    DcMotor getIntake();
+>>>>>>> 682450fc4cab78de012be13d76cce6d6eb04e7da
 
+    DcMotor getRightpuldaun();
+    DcMotor getLeftpuldaun();
+
+    Servo getBucket();
+    Servo getMarker();
     BNO055IMU getImu();
 
     int getCameraViewId();
@@ -38,4 +48,7 @@ public interface UsesHardware {
     String getTfodModelAsset();
     String getLabelGoldMineral();
     String getLabelSilverMineral();
+
+    boolean playRick();
+    boolean playUSSR();
 }

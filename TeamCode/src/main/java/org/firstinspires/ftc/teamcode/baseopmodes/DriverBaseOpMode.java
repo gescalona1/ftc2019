@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.baseopmodes;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -29,16 +30,20 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     protected ElapsedTime runtime = new ElapsedTime();
     protected org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap map;
 
-
     @Override
     public void init() {
         hardwareInit();
         RobotDriver.getDriver().setHardwareMap(this);
-        RobotDriver.getDriver().resetAngle();
         inita();
         initb();
     }
 
+    @Override
+    public void stop(){
+        RobotDriver.getDriver().setHardwareMap(null);
+        map = null;
+        stopb();
+    }
     private void inita(){
         this.runtime.reset();
         telemetry.addData("Status", "Initializing");
@@ -54,35 +59,49 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     }
 
     public abstract void initb();
-
+    public abstract void stopb();
     @Override
     public void hardwareInit(){
         map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
+<<<<<<< HEAD
         map.driverHardwareInit(telemetry);
+=======
+        map.driverhardwareinit(telemetry);
     }
 
     @Override
-    public DcMotor getLeftFrontDrive() {
+    public boolean playRick(){
+        return map.playRick();
+    }
+    @Override
+    public boolean playUSSR(){
+        return map.playUSSR();
+>>>>>>> 682450fc4cab78de012be13d76cce6d6eb04e7da
+    }
+
+    @Override
+    public final DcMotor getLeftFrontDrive() {
         return map.getLeftFrontDrive();
     }
 
     @Override
-    public DcMotor getRightFrontDrive() {
+    public final DcMotor getRightFrontDrive() {
         return map.getRightFrontDrive();
     }
 
     @Override
-    public DcMotor getLeftBackDrive() {
+    public final DcMotor getLeftBackDrive() {
         return map.getLeftBackDrive();
     }
 
     @Override
-    public DcMotor getRightBackDrive() {
+    public final DcMotor getRightBackDrive() {
         return map.getRightBackDrive();
     }
 
 
     @Override
+<<<<<<< HEAD
     public DcMotor getRightpuldaun() {
         return map.getRightpuldaun();
     }
@@ -102,35 +121,61 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     @Override
     public DcMotor getRotate() {
         return map.getRotate();
+=======
+    public final DcMotor getRightpuldaun() {
+        return map.getRightpuldaun();
+    }
+    @Override
+    public final DcMotor getLeftpuldaun() {
+        return map.getLeftpuldaun();
     }
 
     @Override
-    public BNO055IMU getImu() {
+    public final DcMotor getIntake() {
+        return map.getIntake();
+    }
+
+    @Override
+    public final DcMotor getLift() { return map.getLift(); }
+
+    @Override
+    public final Servo getBucket() {
+        return map.getBucket();
+    }
+
+    @Override
+    public final Servo getMarker() {
+        return map.getMarker();
+>>>>>>> 682450fc4cab78de012be13d76cce6d6eb04e7da
+    }
+
+    @Override
+    public final BNO055IMU getImu() {
         return map.getImu();
     }
 
     @Override
-    public int getCameraViewId(){
+    public final int getCameraViewId(){
         return map.getCameraViewId();
     }
 
     @Override
-    public VuforiaLocalizer getVuforia() {
+    public final VuforiaLocalizer getVuforia() {
         return map.getVuforia();
     }
 
     @Override
-    public TFObjectDetector getTfod() {
+    public final TFObjectDetector getTfod() {
         return map.getTfod();
     }
 
-    public String getTfodModelAsset() {
+    public final String getTfodModelAsset() {
         return map.getTfodModelAsset();
     }
-    public String getLabelGoldMineral() {
+    public final String getLabelGoldMineral() {
         return map.getLabelGoldMineral();
     }
-    public String getLabelSilverMineral() {
+    public final String getLabelSilverMineral() {
         return map.getLabelSilverMineral();
     }
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.baseopmodes;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -25,6 +26,7 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     public void runOpMode(){
         telemetry.addData("Hardware Initialization:", "Not done");
         telemetry.update();
+
         hardwareInit();
         RobotDriver.getDriver().setHardwareMap(this);
         RobotDriver.getDriver().resetAngle();
@@ -49,28 +51,51 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
         map = new HardwareMap(hardwareMap);
         map.hardwareInit(telemetry);
     }
-
     @Override
-    public DcMotor getLeftFrontDrive() {
+    public boolean playRick(){
+        return map.playRick();
+    }
+    @Override
+    public boolean playUSSR(){
+        return map.playUSSR();
+    }
+    @Override
+    public final DcMotor getLeftFrontDrive() {
         return map.getLeftFrontDrive();
     }
 
     @Override
-    public DcMotor getRightFrontDrive() {
+    public final DcMotor getRightFrontDrive() {
         return map.getRightFrontDrive();
     }
 
     @Override
-    public DcMotor getLeftBackDrive() {
+    public final DcMotor getLeftBackDrive() {
         return map.getLeftBackDrive();
     }
 
     @Override
-    public DcMotor getRightBackDrive() {
+    public final DcMotor getRightBackDrive() {
         return map.getRightBackDrive();
     }
 
+
     @Override
+    public final DcMotor getRightpuldaun() {
+        return map.getRightpuldaun();
+    }
+    @Override
+    public final DcMotor getLeftpuldaun() {
+        return map.getLeftpuldaun();
+    }
+
+    @Override
+    public final DcMotor getIntake() {
+        return map.getIntake();
+    }
+
+    @Override
+<<<<<<< HEAD
     public DcMotor getRightpuldaun() {
         return map.getRightpuldaun();
     }
@@ -92,34 +117,46 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     public DcMotor getRotate() {
         return map.getRotate();
     }
+=======
+    public final DcMotor getLift() { return map.getLift(); }
+>>>>>>> 682450fc4cab78de012be13d76cce6d6eb04e7da
 
     @Override
-    public BNO055IMU getImu() {
+    public final Servo getBucket() {
+        return map.getBucket();
+    }
+
+    @Override
+    public final Servo getMarker() {
+        return map.getMarker();
+    }
+    @Override
+    public final BNO055IMU getImu() {
         return map.getImu();
     }
 
     @Override
-    public int getCameraViewId(){
+    public final int getCameraViewId(){
         return map.getCameraViewId();
     }
 
     @Override
-    public VuforiaLocalizer getVuforia() {
+    public final VuforiaLocalizer getVuforia() {
         return map.getVuforia();
     }
 
     @Override
-    public TFObjectDetector getTfod() {
+    public final TFObjectDetector getTfod() {
         return map.getTfod();
     }
 
-    public String getTfodModelAsset() {
+    public final String getTfodModelAsset() {
         return map.getTfodModelAsset();
     }
-    public String getLabelGoldMineral() {
+    public final String getLabelGoldMineral() {
         return map.getLabelGoldMineral();
     }
-    public String getLabelSilverMineral() {
+    public final String getLabelSilverMineral() {
         return map.getLabelSilverMineral();
     }
 }
