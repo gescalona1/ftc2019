@@ -81,18 +81,28 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
 
 
     @Override
-    public final DcMotor getRightpuldaun() {
+    public DcMotor getRightpuldaun() {
         return map.getRightpuldaun();
     }
+
     @Override
-    public final DcMotor getLeftpuldaun() {
+    public DcMotor getLeftpuldaun() {
         return map.getLeftpuldaun();
     }
 
     @Override
-    public final DcMotor getIntake() {
+    public Servo getIntake() {
         return map.getIntake();
     }
+
+    @Override
+    public DcMotor getExtend() { return map.getExtend(); }
+
+    @Override
+    public DcMotor getRotate() {
+        return map.getRotate();
+    }
+
 
     @Override
     public final Servo getBucket() {
@@ -132,5 +142,4 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     public final String getLabelSilverMineral() {
         return map.getLabelSilverMineral();
     }
-
 }

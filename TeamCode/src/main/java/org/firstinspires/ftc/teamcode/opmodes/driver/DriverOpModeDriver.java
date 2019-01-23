@@ -89,16 +89,41 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         double leftStickX = gamepad1.left_stick_x;
 
         double rightStickX = gamepad1.right_stick_x;
-        RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
-        /*
-        if(gamepad2.right_trigger > 0){
-            getLift().setPower(gamepad2.right_trigger);
-        }else if(gamepad2.left_trigger > 0) {
-            getLift().setPower(-gamepad2.left_trigger/2);
-        }else{
-            getLift().setPower(0);
+        if(gamepad1.right_bumper){
+            getRightpuldaun().setPower(0.5);
+            getLeftpuldaun().setPower(0.5);
+        }else if (gamepad1.left_bumper){
+            getRightpuldaun().setPower(-0.5);
+            getLeftpuldaun().setPower(-0.5);
+        } else {
+            getRightpuldaun().setPower(0);
+            getLeftpuldaun().setPower(0);
         }
-        */
+
+        if(gamepad1.right_trigger > 0){
+            getRotate().setPower(gamepad1.right_trigger);
+        } else if(gamepad1.left_trigger > 0){
+            getRotate().setPower(-gamepad1.left_trigger);
+        } else {
+            getRotate().setPower(0);
+        }
+
+        if(gamepad1.y){
+            getExtend().setPower(1);
+        } else if(gamepad1.a){
+            getExtend().setPower(-1);
+        } else {
+            getExtend().setPower(0);
+        }
+
+        if(gamepad1.x){
+            getIntake().setPosition(0);
+        } else if(gamepad1.b){
+            getIntake().setPosition(1);
+        } else{
+            getIntake().setPosition(0.5);
+        }
+
         if(gamepad1.y || gamepad2.y){
             pos = 0;
         }else if(gamepad1.a || gamepad2.a){
@@ -113,13 +138,6 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         }else {
             getRightpuldaun().setPower(-gamepad1.left_trigger);
             getLeftpuldaun().setPower(-gamepad1.left_trigger);
-        }
-        if(gamepad2.dpad_down){
-            getIntake().setPower(1);
-        }else if(gamepad2.dpad_up){
-            getIntake().setPower(-1);
-        }else if(gamepad2.dpad_left){
-            getIntake().setPower(0);
         }
 
         if(gamepad1.dpad_up){

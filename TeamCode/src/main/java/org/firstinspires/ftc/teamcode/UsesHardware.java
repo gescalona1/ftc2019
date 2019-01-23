@@ -21,10 +21,15 @@ public interface UsesHardware {
     DcMotor getRightFrontDrive();
     DcMotor getLeftBackDrive();
     DcMotor getRightBackDrive();
-    DcMotor getIntake();
+
+    DcMotor getRotate();
+    DcMotor getExtend();
 
     DcMotor getRightpuldaun();
     DcMotor getLeftpuldaun();
+
+    Servo getIntake();
+
 
     Servo getBucket();
     Servo getMarker();

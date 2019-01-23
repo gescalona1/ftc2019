@@ -63,7 +63,7 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     @Override
     public void hardwareInit(){
         map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
-        map.driverhardwareinit(telemetry);
+        map.driverHardwareInit(telemetry);
     }
 
     @Override
@@ -95,8 +95,18 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
         return map.getRightBackDrive();
     }
 
+    @Override
+    public Servo getIntake() {
+        return map.getIntake();
+    }
 
     @Override
+    public DcMotor getExtend() { return map.getExtend(); }
+
+    @Override
+    public DcMotor getRotate() {
+        return map.getRotate();
+    }
     public final DcMotor getRightpuldaun() {
         return map.getRightpuldaun();
     }
@@ -105,10 +115,6 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
         return map.getLeftpuldaun();
     }
 
-    @Override
-    public final DcMotor getIntake() {
-        return map.getIntake();
-    }
 
     @Override
     public final Servo getBucket() {

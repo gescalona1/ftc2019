@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.util.Position;
  *
  * @version 1.0 10/11/2018
  */
-@Disabled
 @Autonomous(name = "Gyro Turn Test", group = "auto")
 public class GyroTurnTest extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
