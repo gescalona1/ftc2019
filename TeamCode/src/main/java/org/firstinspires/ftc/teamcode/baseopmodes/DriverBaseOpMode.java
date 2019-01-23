@@ -92,16 +92,16 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     }
 
     @Override
-    public DcMotor getIntake() {
+    public Servo getIntake() {
         return map.getIntake();
     }
 
     @Override
-    public DcMotor getLift() { return map.getLift(); }
+    public DcMotor getExtend() { return map.getExtend(); }
 
     @Override
-    public Servo getBucket() {
-        return map.getBucket();
+    public DcMotor getRotate() {
+        return map.getRotate();
     }
 
     @Override

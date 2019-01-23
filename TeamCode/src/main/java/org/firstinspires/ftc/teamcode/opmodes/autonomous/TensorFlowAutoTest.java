@@ -21,15 +21,22 @@ public class TensorFlowAutoTest extends AutonomousBaseOpMode {
 
     @Override
     public void runOpMode(){
+
+    }
+    /*
+    Before waitforStart()
+     */
+    @Override
+    protected void prerun() {
         map = new HardwareMap(hardwareMap);
         telemetry.addData("Hardware Initialization:", "Not done");
         telemetry.update();
-        map.initCamera(telemetry);
+//        map.initCamera(telemetry);
         RobotDriver.getDriver().setHardwareMap(this);
         telemetry.addData("Hardware Initialization:", "Finished");
         telemetry.update();
         prerun();
-        waitForStart();
+//        waitForStart();
         if (opModeIsActive()) {
             /** Activate Tensor Flow Object Detection. */
             if (getTfod() != null) {
@@ -74,13 +81,6 @@ public class TensorFlowAutoTest extends AutonomousBaseOpMode {
             getTfod().shutdown();
         }
         RobotDriver.getDriver().setHardwareMap(null);
-    }
-    /*
-    Before waitforStart()
-     */
-    @Override
-    protected void prerun() {
-
     }
     /*
     After waitForStart()

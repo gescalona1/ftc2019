@@ -21,13 +21,13 @@ public interface UsesHardware {
     DcMotor getRightFrontDrive();
     DcMotor getLeftBackDrive();
     DcMotor getRightBackDrive();
-    DcMotor getLift();
-    DcMotor getIntake();
+    DcMotor getRotate();
+    DcMotor getExtend();
 
     DcMotor getRightpuldaun();
     DcMotor getLeftpuldaun();
 
-    Servo getBucket();
+    Servo getIntake();
 
     BNO055IMU getImu();
 

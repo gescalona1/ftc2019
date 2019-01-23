@@ -26,14 +26,14 @@ public class RobotDriver {
     private Orientation currentAngle;
 
     private final double  BAR_COUNTS_PER_MOTOR_REV  =    1120;
-    private final double  BAR_DRIVE_GEAR_REDUCTION  =   0.945;
-    private final double  BAR_WHEEL_DIAMETER_INCHES =   2.717;
+    private final double  BAR_DRIVE_GEAR_REDUCTION  =   1;
+    private final double  BAR_WHEEL_DIAMETER_INCHES =   1.428;
     private final double  BAR_COUNTS_PER_INCH       =   BAR_COUNTS_PER_MOTOR_REV * (BAR_DRIVE_GEAR_REDUCTION/BAR_WHEEL_DIAMETER_INCHES)
                                                         / (Math.PI*4);
 
     private final double DRIVE_COUNTS_PER_MOTOR_HEX  =    1120;
-    private final double DRIVE_DRIVE_GEAR_REDUCTION  =   0.945;
-    private final double DRIVE_WHEEL_DIAMETER_INCHES =   2.717;
+    private final double DRIVE_DRIVE_GEAR_REDUCTION  =   24 / 15;
+    private final double DRIVE_WHEEL_DIAMETER_INCHES =   4;
     private final double DRIVE_COUNTS_PER_INCH       =   DRIVE_COUNTS_PER_MOTOR_HEX * (DRIVE_DRIVE_GEAR_REDUCTION/DRIVE_WHEEL_DIAMETER_INCHES)
                                                          / (Math.PI*4);
     /**
@@ -43,10 +43,10 @@ public class RobotDriver {
      * @param right_stick_x gamepadrightX
      */
     public void mecanumDrive(double left_stick_y, double left_stick_x, double right_stick_x){
-        double LB = Range.clip(-left_stick_y - left_stick_x + right_stick_x, -1, 1);
-        double LF = Range.clip(-left_stick_y + left_stick_x + right_stick_x, -1, 1);
-        double RB = Range.clip(-left_stick_y + left_stick_x - right_stick_x, -1, 1);
-        double RF = Range.clip(-left_stick_y - left_stick_x - right_stick_x, -1, 1);
+        double LB = Range.clip(-left_stick_y - left_stick_x - right_stick_x, -1, 1);
+        double LF = Range.clip(-left_stick_y + left_stick_x - right_stick_x, -1, 1);
+        double RB = Range.clip(-left_stick_y + left_stick_x + right_stick_x, -1, 1);
+        double RF = Range.clip(-left_stick_y - left_stick_x + right_stick_x, -1, 1);
         opmode.getLeftBackDrive().setPower(LB);
         opmode.getLeftFrontDrive().setPower(LF);
         opmode.getRightBackDrive().setPower(RB);
@@ -77,21 +77,7 @@ public class RobotDriver {
         opmode.getRightBackDrive().setPower(v4);
     }
 
-    public void mechanumDriveForward(int speed){
-        //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
-        DcMotor leftBack = opmode.getLeftBackDrive();
-        DcMotor leftFront = opmode.getLeftFrontDrive();
-        DcMotor rightBack = opmode.getRightBackDrive();
-        DcMotor rightFront = opmode.getRightFrontDrive();
-        //</editor-fold>
-        //<editor-fold desc="Setting Power to speed">
-        leftBack.setPower(speed);
-        rightFront.setPower(speed);
-        leftFront.setPower(speed);
-        rightBack.setPower(speed);
-        //</editor-fold>
-    }
-    public void mechanumDriveRight(int inches, int speed){
+    public void mechanumDriveForward(double inches, double speed){
         //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
         DcMotor leftBack = opmode.getLeftBackDrive();
         DcMotor leftFront = opmode.getLeftFrontDrive();
@@ -100,8 +86,56 @@ public class RobotDriver {
         //</editor-fold>
         int newleftBackTarget = leftBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
         int newrightFrontTarget = rightFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
-        int newleftFrontTarget = leftFront.getCurrentPosition() + -(int)(inches * DRIVE_COUNTS_PER_INCH);
-        int newrightBackTarget = rightBack.getCurrentPosition() + -(int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newleftFrontTarget = leftFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightBackTarget = rightBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        //<editor-fold desc="Setting to RUN_TO_POSITION">
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //</editor-fold>
+        //<editor-fold desc="Setting Target Positions">
+        leftBack.setTargetPosition(newleftBackTarget);
+        leftFront.setTargetPosition(newleftFrontTarget);
+        rightBack.setTargetPosition(newrightBackTarget);
+        rightFront.setTargetPosition(newrightFrontTarget);
+        //</editor-fold>
+        //<editor-fold desc="Setting Power">
+        leftBack.setPower(speed);
+        rightFront.setPower(speed);
+        leftFront.setPower(speed);
+        rightBack.setPower(speed);
+        //</editor-fold>
+        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
+            if(opmode instanceof OpMode){
+                ((OpMode) opmode).telemetry.addData("Speed", speed);
+                ((OpMode) opmode).telemetry.addData("Currently going:", "right");
+            }
+        }
+        //<editor-fold desc="Setting Power to 0">
+        leftBack.setPower(0);
+        rightFront.setPower(0);
+        leftFront.setPower(0);
+        rightBack.setPower(0);
+        //</editor-fold>
+        //<editor-fold desc="Setting to RUN_WITHOUT_ENCODER">
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //</editor-fold>
+    }
+    public void mechanumDriveRight(int inches, double speed){
+        //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
+        DcMotor leftBack = opmode.getLeftBackDrive();
+        DcMotor leftFront = opmode.getLeftFrontDrive();
+        DcMotor rightBack = opmode.getRightBackDrive();
+        DcMotor rightFront = opmode.getRightFrontDrive();
+        //</editor-fold>
+        int newleftBackTarget = leftBack.getCurrentPosition() - (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightFrontTarget = rightFront.getCurrentPosition() - (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newleftFrontTarget = leftFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightBackTarget = rightBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
         //<editor-fold desc="Setting to RUN_TO_POSITION">
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -140,17 +174,17 @@ public class RobotDriver {
         //</editor-fold>
     }
 
-    public void mechanumDriveLeft(int inches, int speed){
+    public void mechanumDriveLeft(int inches, double speed){
         //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
         DcMotor leftBack = opmode.getLeftBackDrive();
         DcMotor leftFront = opmode.getLeftFrontDrive();
         DcMotor rightBack = opmode.getRightBackDrive();
         DcMotor rightFront = opmode.getRightFrontDrive();
         //</editor-fold>
-        int newleftBackTarget = leftBack.getCurrentPosition() + -(int)(inches * DRIVE_COUNTS_PER_INCH);
-        int newrightFrontTarget = rightFront.getCurrentPosition() + -(int)(inches * DRIVE_COUNTS_PER_INCH);
-        int newleftFrontTarget = leftFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
-        int newrightBackTarget = rightBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newleftBackTarget = leftBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightFrontTarget = rightFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newleftFrontTarget = leftFront.getCurrentPosition() - (int)(inches * DRIVE_COUNTS_PER_INCH);
+        int newrightBackTarget = rightBack.getCurrentPosition() - (int)(inches * DRIVE_COUNTS_PER_INCH);
         //<editor-fold desc="Setting to RUN_TO_POSITION">
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -182,11 +216,173 @@ public class RobotDriver {
         rightBack.setPower(0);
         //</editor-fold>
         //<editor-fold desc="Setting to RUN_WITHOUT_ENCODER">
+
+        //</editor-fold>
+    }
+    public void encoderTurnLeft45(double speed){
+        DcMotor leftBack = opmode.getLeftBackDrive();
+        DcMotor leftFront = opmode.getLeftFrontDrive();
+        DcMotor rightBack = opmode.getRightBackDrive();
+        DcMotor rightFront = opmode.getRightFrontDrive();
+
+        //</editor-fold>
+        int newleftBackTarget = leftBack.getCurrentPosition() - (int)(40 * DRIVE_COUNTS_PER_INCH);
+        int newrightFrontTarget = rightFront.getCurrentPosition() + (int)(40 * DRIVE_COUNTS_PER_INCH);
+        int newleftFrontTarget = leftFront.getCurrentPosition() - (int)(40 * DRIVE_COUNTS_PER_INCH);
+        int newrightBackTarget = rightBack.getCurrentPosition() + (int)(40 * DRIVE_COUNTS_PER_INCH);
+
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //</editor-fold>
+
+        leftBack.setTargetPosition(newleftBackTarget);
+        leftFront.setTargetPosition(newleftFrontTarget);
+        rightBack.setTargetPosition(newrightBackTarget);
+        rightFront.setTargetPosition(newrightFrontTarget);
+
+        leftBack.setPower(speed);
+        rightFront.setPower(speed);
+        leftFront.setPower(speed);
+        rightBack.setPower(speed);
+
+        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
+            if(opmode instanceof OpMode){
+                ((OpMode) opmode).telemetry.addData("Speed", speed);
+                ((OpMode) opmode).telemetry.addData("Currently going:", "Turning");
+            }
+        }
+        //<editor-fold desc="Setting Power to 0">
+        leftBack.setPower(0);
+        rightFront.setPower(0);
+        leftFront.setPower(0);
+        rightBack.setPower(0);
+
+    }
+
+    public void turnLeft(double speed){
+        int newLeftTarget;
+        int newRightTarget;
+        int newLeftBottomTarget;
+        int newRightBottomTarget;
+        DcMotor leftBack = opmode.getLeftBackDrive();
+        DcMotor leftFront = opmode.getLeftFrontDrive();
+        DcMotor rightBack = opmode.getRightBackDrive();
+        DcMotor rightFront = opmode.getRightFrontDrive();
+
+        // Determine new target position, and pass to motor controller
+        newLeftTarget = leftFront.getCurrentPosition() + (int)(20 * DRIVE_COUNTS_PER_INCH);
+        newLeftBottomTarget = leftBack.getCurrentPosition() + (int)(20 * DRIVE_COUNTS_PER_INCH);
+        newRightTarget = rightFront.getCurrentPosition() + (int)(-20 * DRIVE_COUNTS_PER_INCH);
+        newRightBottomTarget = rightBack.getCurrentPosition() + (int)(-20 * DRIVE_COUNTS_PER_INCH);
+        leftFront.setTargetPosition(newLeftTarget);
+        leftBack.setTargetPosition(newLeftBottomTarget);
+        rightFront.setTargetPosition(newRightTarget);
+        rightBack.setTargetPosition(newRightBottomTarget);
+
+        // Turn On RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // reset the timeout time and start motion.
+//        runtime.reset();
+        leftFront.setPower(Math.abs(speed));
+        leftBack.setPower(Math.abs(speed));
+        rightFront.setPower(Math.abs(speed));
+        rightBack.setPower(Math.abs(speed));
+
+        // keep looping while we are still active, and there is time left, and both motors are running.
+        // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+        // its target position, the motion will stop.  This is "safer" in the event that the robot will
+        // always end the motion as soon as possible.
+        // However, if you require that BOTH motors have finished their moves before the robot continues
+        // onto the next step, use (isBusy() || isBusy()) in the loop test.
+
+        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
+            if(opmode instanceof OpMode){
+                ((OpMode) opmode).telemetry.addData("Speed", speed);
+                ((OpMode) opmode).telemetry.addData("Currently going:", "Turning");
+            }
+            ((OpMode) opmode).telemetry.update();
+        }
+        // Stop all motion;
+        leftFront.setPower(0);
+        leftBack.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+
+        // Turn off RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void turnRight(double speed){
+        int newLeftTarget;
+        int newRightTarget;
+        int newLeftBottomTarget;
+        int newRightBottomTarget;
+        DcMotor leftBack = opmode.getLeftBackDrive();
+        DcMotor leftFront = opmode.getLeftFrontDrive();
+        DcMotor rightBack = opmode.getRightBackDrive();
+        DcMotor rightFront = opmode.getRightFrontDrive();
+
+        // Determine new target position, and pass to motor controller
+        newLeftTarget = leftFront.getCurrentPosition() + (int)(-20 * DRIVE_COUNTS_PER_INCH);
+        newLeftBottomTarget = leftBack.getCurrentPosition() + (int)(-20 * DRIVE_COUNTS_PER_INCH);
+        newRightTarget = rightFront.getCurrentPosition() + (int)(20 * DRIVE_COUNTS_PER_INCH);
+        newRightBottomTarget = rightBack.getCurrentPosition() + (int)(20 * DRIVE_COUNTS_PER_INCH);
+        leftFront.setTargetPosition(newLeftTarget);
+        leftBack.setTargetPosition(newLeftBottomTarget);
+        rightFront.setTargetPosition(newRightTarget);
+        rightBack.setTargetPosition(newRightBottomTarget);
+
+        // Turn On RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // reset the timeout time and start motion.
+//        runtime.reset();
+        leftFront.setPower(Math.abs(speed));
+        leftBack.setPower(Math.abs(speed));
+        rightFront.setPower(Math.abs(speed));
+        rightBack.setPower(Math.abs(speed));
+
+        // keep looping while we are still active, and there is time left, and both motors are running.
+        // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+        // its target position, the motion will stop.  This is "safer" in the event that the robot will
+        // always end the motion as soon as possible.
+        // However, if you require that BOTH motors have finished their moves before the robot continues
+        // onto the next step, use (isBusy() || isBusy()) in the loop test.
+
+        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
+            if(opmode instanceof OpMode){
+                ((OpMode) opmode).telemetry.addData("Speed", speed);
+                ((OpMode) opmode).telemetry.addData("Currently going:", "Turning");
+            }
+            ((OpMode) opmode).telemetry.update();
+        }
+        // Stop all motion;
+        leftFront.setPower(0);
+        leftBack.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+
+        // Turn off RUN_TO_POSITION
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void extendPullDownBar(int inches, int speed){

@@ -79,12 +79,6 @@ public class AutonomousWithoutPullbarMode extends AutonomousBaseOpMode {
                     }
                 }
             }
-            driver.mechanumDriveForward(1);
-            sleep(3 * 1000);
-            driver.mechanumDriveForward(0);
-            if (getTfod() != null) {
-                getTfod().shutdown();
-            }
         }
     }
 }
