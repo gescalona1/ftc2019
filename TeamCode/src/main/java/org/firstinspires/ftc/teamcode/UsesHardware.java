@@ -21,7 +21,6 @@ public interface UsesHardware {
     DcMotor getRightFrontDrive();
     DcMotor getLeftBackDrive();
     DcMotor getRightBackDrive();
-    DcMotor getLift();
     DcMotor getIntake();
 
     DcMotor getRightpuldaun();

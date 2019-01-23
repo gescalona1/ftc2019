@@ -90,6 +90,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
 
         double rightStickX = gamepad1.right_stick_x;
         RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
+        /*
         if(gamepad2.right_trigger > 0){
             getLift().setPower(gamepad2.right_trigger);
         }else if(gamepad2.left_trigger > 0) {
@@ -97,6 +98,7 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         }else{
             getLift().setPower(0);
         }
+        */
         if(gamepad1.y || gamepad2.y){
             pos = 0;
         }else if(gamepad1.a || gamepad2.a){

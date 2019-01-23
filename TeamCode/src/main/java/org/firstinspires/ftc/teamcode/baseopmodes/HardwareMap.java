@@ -38,7 +38,6 @@ public final class HardwareMap {
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
-    private DcMotor lift = null;
     private DcMotor intake = null;
 
     private DcMotor rightpuldaun = null;
@@ -96,18 +95,18 @@ public final class HardwareMap {
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        lift = hardwareMap.get(DcMotor.class, "lift");
-        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         rightpuldaun = hardwareMap.get(DcMotor.class, "RP");
         leftpuldaun = hardwareMap.get(DcMotor.class, "LP");
         intake = hardwareMap.get(DcMotor.class, "intake");
+
+
+        leftpuldaun.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightpuldaun.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -116,7 +115,6 @@ public final class HardwareMap {
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        lift.setDirection(DcMotor.Direction.FORWARD);
         intake.setDirection(DcMotor.Direction.FORWARD);
         rightpuldaun.setDirection(DcMotor.Direction.FORWARD);
         leftpuldaun.setDirection(DcMotor.Direction.REVERSE);
@@ -205,9 +203,6 @@ public final class HardwareMap {
     }
     public final DcMotor getRightBackDrive() {
         return rightBackDrive;
-    }
-    public final DcMotor getLift() {
-        return lift;
     }
 
     public final DcMotor getRightpuldaun() {

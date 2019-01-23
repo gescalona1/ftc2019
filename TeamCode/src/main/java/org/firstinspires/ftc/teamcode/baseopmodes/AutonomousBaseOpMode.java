@@ -95,9 +95,6 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     }
 
     @Override
-    public final DcMotor getLift() { return map.getLift(); }
-
-    @Override
     public final Servo getBucket() {
         return map.getBucket();
     }

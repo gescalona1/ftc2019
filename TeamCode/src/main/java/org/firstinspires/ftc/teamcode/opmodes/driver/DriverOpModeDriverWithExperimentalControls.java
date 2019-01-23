@@ -88,9 +88,9 @@ public class DriverOpModeDriverWithExperimentalControls extends DriverBaseOpMode
 
         RobotDriver.getDriver().mecanumDrive(leftStickY, leftStickX, rightStickX);
         if(gamepad1.right_trigger > 0){
-            getLift().setPower(gamepad1.left_trigger);
+            //getLift().setPower(gamepad1.left_trigger);
         }else {
-            getLift().setPower(-gamepad1.left_trigger/2);
+            //getLift().setPower(-gamepad1.left_trigger/2);
         }
         if(gamepad1.y || gamepad2.y){
             pos = 0;

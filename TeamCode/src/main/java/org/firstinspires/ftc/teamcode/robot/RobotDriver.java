@@ -23,7 +23,6 @@ public class RobotDriver {
     private UsesHardware opmode;
     private Telemetry telemetry;
     private boolean gyroTurning = false;
-
     private Orientation currentAngle;
 
     private final double  BAR_COUNTS_PER_MOTOR_REV  =    2240;

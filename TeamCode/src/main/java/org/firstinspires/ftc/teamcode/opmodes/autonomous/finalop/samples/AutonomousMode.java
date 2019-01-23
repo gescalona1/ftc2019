@@ -22,6 +22,7 @@ import java.util.List;
 @Autonomous(name = "Main Autonomous", group = "auto")
 public class AutonomousMode extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
+    private double lastTime;
     private Position position;
     /*
        The higher number this is, the more accurate autonomous is
@@ -47,7 +48,8 @@ public class AutonomousMode extends AutonomousBaseOpMode {
     @Override
     protected void run() {
         List<Position> positions = new ArrayList<>();
-        while (opModeIsActive()) {
+        lastTime = getRuntime();
+        while (opModeIsActive() && getRuntime() - lastTime > 6) {
             if (getTfod() != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
@@ -103,10 +105,9 @@ public class AutonomousMode extends AutonomousBaseOpMode {
                 }
             }
         }
-        driver.extendPullDownBar(9, 0.8);
-        driver.mecanumDriveRight(3, 0.5);
+        driver.extendPullDownBar(3, 0.8);
         new Thread(() -> {
-            driver.extendPullDownBar(-9, 0.7);
+            driver.extendPullDownBar(-3, 0.7);
             while(opModeIsActive()){
                 if (getTfod() != null) {
                     getTfod().shutdown();
@@ -114,29 +115,32 @@ public class AutonomousMode extends AutonomousBaseOpMode {
             }
         }).start();
         driver.mecanumDriveForward(2, 0.5);
-
-        switch(position){
-            case LEFT:
-                driver.mecanumDriveLeft(2, 0.5);
-                telemetry.addLine("Going LEFT");
-                break;
-            case RIGHT:
-                driver.mecanumDriveRight(2, 0.5);
-                telemetry.addLine("Going RIGHT");
-                break;
-            case CENTER:
-                telemetry.addLine("Going CENTER");
-                break;
+        if(position != null) {
+            switch (position) {
+                case LEFT:
+                    driver.mecanumDriveLeft(2, 0.5);
+                    telemetry.addLine("Going LEFT");
+                    break;
+                case RIGHT:
+                    driver.mecanumDriveRight(2, 0.5);
+                    telemetry.addLine("Going RIGHT");
+                    break;
+                case CENTER:
+                    telemetry.addLine("Going CENTER");
+                    break;
+            }
         }
         telemetry.update();
         driver.mecanumDriveForward(1, 1);
-        driver.mecanumDriveBackward(1, 1);
-        driver.gyroTurn(180, 1);
+        driver.gyroTurn(-50, 1);
         driver.mecanumDriveRight(10, 1);
-        driver.gyroTurn(30, 1);
         driver.mecanumDriveForward(1);
-        sleep(3000);
+        sleep(1500);
         driver.mecanumDriveForward(0);
+        getBucket().setPosition(0.9d);
+        new Thread(() -> {
+            getBucket().setPosition(0.3d);
+        }).start();
         driver.mecanumDriveRight(3, 1);
         driver.mecanumDriveBackward(1);
         sleep(6000);

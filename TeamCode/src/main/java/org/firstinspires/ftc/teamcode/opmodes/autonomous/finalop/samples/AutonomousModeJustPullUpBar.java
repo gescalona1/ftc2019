@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
+import org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 import org.firstinspires.ftc.teamcode.util.Position;
 
@@ -18,7 +19,6 @@ import java.util.List;
  *
  * @version 1.0 10/11/2018
  */
-@Disabled
 @Autonomous(name = "Main Autonomous Just pullbar", group = "auto")
 public class AutonomousModeJustPullUpBar extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
@@ -31,13 +31,20 @@ public class AutonomousModeJustPullUpBar extends AutonomousBaseOpMode {
     Before waitforStart()
      */
     @Override
+    public void hardwareInit(){
+        map = new HardwareMap(hardwareMap);
+        map.motorInit();
+        map.imuInit(telemetry);
+        map.initCamera(telemetry);
+    }
+    @Override
     protected void prerun() {
         if (getTfod() != null) {
             getTfod().activate();
         }else{
             prerun();
         }
-        getBucket().setPosition(0.5);
+        //getBucket().setPosition(0.5);
         telemetry.addLine("Ready, press init!");
         telemetry.update();
     }
@@ -46,17 +53,18 @@ public class AutonomousModeJustPullUpBar extends AutonomousBaseOpMode {
      */
     @Override
     protected void run() {
-        driver.extendPullDownBar(22, 0.8);
-        sleep(1000);
-        driver.mecanumDriveForward(2, 0.5);
+        driver.extendPullDownBar(2, 0.6);
+        sleep(3000);
+        //driver.mecanumDriveForward(2, 0.5);
         new Thread(() -> {
-            driver.extendPullDownBar(-22, 0.7);
+            driver.extendPullDownBar(-2, 0.7);
             while(opModeIsActive()){
                 if (getTfod() != null) {
                     getTfod().shutdown();
                 }
             }
         }).start();
+        /*
         List<Position> positions = new ArrayList<>();
         while (opModeIsActive()) {
             if (getTfod() != null) {
@@ -107,7 +115,7 @@ public class AutonomousModeJustPullUpBar extends AutonomousBaseOpMode {
                                 }catch (ArrayIndexOutOfBoundsException e) {
                                     break;
                                 }
-                            }*/
+                            }
                         }
                     }
                     telemetry.update();
@@ -127,5 +135,6 @@ public class AutonomousModeJustPullUpBar extends AutonomousBaseOpMode {
                 telemetry.addLine("Going CENTER");
                 break;
         }
+        */
     }
 }
