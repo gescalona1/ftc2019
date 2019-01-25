@@ -97,10 +97,6 @@ public final class HardwareMap {
         telemetry.update();
     }
 
-    public void driverhardwareinit(Telemetry telemetry){
-        motorInit();
-        servoInit();
-    }
 
     public void motorInit(){
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "LF");

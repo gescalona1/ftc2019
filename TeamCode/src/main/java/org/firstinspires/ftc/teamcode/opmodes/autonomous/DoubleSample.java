@@ -32,6 +32,8 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
+import org.firstinspires.ftc.teamcode.util.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -55,88 +57,69 @@ import java.util.List;
 //@Disabled
 public class DoubleSample extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
-    public static String position = null;
+    public Position position = null;
+    private final int CHECKS = 5;
+    private final double SPEED = 0.6;
 
     @Override
     protected void prerun() {
-        if (getTfod() != null) {
-            getTfod().activate();
-        }
-
-        while (!opModeIsActive()) {
-            if (getTfod() != null) {
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = getTfod().getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    if (updatedRecognitions.size() == 3) {
-                        int goldMineralX = -1;
-                        int silverMineral1X = -1;
-                        int silverMineral2X = -1;
-                        for (Recognition recognition : updatedRecognitions) {
-                            if (recognition.getLabel().equals(getLabelGoldMineral())) {
-                                goldMineralX = (int) recognition.getLeft();
-                            } else if (silverMineral1X == -1) {
-                                silverMineral1X = (int) recognition.getLeft();
-                            } else {
-                                silverMineral2X = (int) recognition.getLeft();
-                            }
-                        }
-                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                telemetry.addData("Gold Mineral Position", "Left");
-                                position = "Left";
-                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                telemetry.addData("Gold Mineral Position", "Right");
-                                position = "Right";
-                            } else {
-                                telemetry.addData("Gold Mineral Position", "Center");
-                                position = "Center";
-                            }
-                        }
-                    }
-                    telemetry.update();
-                }
-//                }
-            }
-        }
-        telemetry.update();
+        resetStartTime();
     }
 
     @Override
     public void run() {
-        telemetry.addData("Position", position);
+        int i = 0;
+        position = FindMineralRunnable.getCurrentPosition();
+        while(true){
+            if(i >= CHECKS) {
+                telemetry.addLine(String.format("Passed accuracy check: Position %s", position));
+                break;
+            }
+            if(position == FindMineralRunnable.getCurrentPosition()) i++;
+            else {
+                run();
+                return; // make sure it only runs this once
+            }
+            if(getRuntime() > 5){ //if 5 seconds elapsed without it being accurate, just set it
+                position = FindMineralRunnable.getCurrentPosition();
+                position = (position == Position.NULL) ? position : Position.RIGHT;
+                telemetry.addLine("Runtime too long, going over");
+                break;
+            }
+        }
         telemetry.update();
-        if (position == "Right") {
-            driver.mecanumDriveForward(-25, 0.5);
-            driver.mecanumDriveLeft(40, 0.5);
-            driver.mecanumDriveForward(-25, 0.5);
-
+        switch (position){
+            case RIGHT:
+                driver.mecanumDriveForward(-25, SPEED);
+                driver.mecanumDriveLeft(40, SPEED);
+                driver.mecanumDriveForward(-25, SPEED);
+                break;
+            case LEFT:
+                driver.mecanumDriveForward(-25, SPEED);
+                driver.mecanumDriveRight(40, SPEED);
+                driver.mecanumDriveForward(-25, SPEED);
+                break;
+            case CENTER:
+                driver.mecanumDriveForward(-25, SPEED);
+                driver.mecanumDriveForward(-25, SPEED);
+                break;
         }
-        if (position == "Left") {
-            driver.mecanumDriveForward(-25, 0.5);
-            driver.mecanumDriveRight(40, 0.5);
-            driver.mecanumDriveForward(-25, 0.5);
+        driver.mecanumDriveForward(25, SPEED);
+        driver.mecanumDriveRight(250, SPEED);
+        driver.mecanumDriveForward(200, SPEED);
+        driver.mecanumDriveRight(100, SPEED);
+        driver.mecanumDriveForward(-25, SPEED);
+        driver.mecanumDriveLeft(40, SPEED);
+        driver.turnRight(SPEED);
+        switch (position){
+            case LEFT:
+                driver.mecanumDriveLeft(40, SPEED);
+                break;
+            case RIGHT:
+                driver.mecanumDriveRight(40, SPEED);
+                break;
         }
-        if (position == "Center") {
-            driver.mecanumDriveForward(-25, 0.5);
-            driver.mecanumDriveForward(-25, 0.5);
-        }
-        driver.mecanumDriveForward(25, 0.5);
-        driver.mecanumDriveRight(250, 0.5);
-        driver.mecanumDriveForward(200, 0.5);
-        driver.mecanumDriveRight(100, 0.5);
-        driver.mecanumDriveForward(-25, 0.5);
-        driver.mecanumDriveLeft(40, 0.5);
-        driver.turnRight(0.5);
-        if (position == "Left") {
-            driver.mecanumDriveLeft(40, 0.5);
-        }
-        if (position == "Right") {
-            driver.mecanumDriveRight(40, 0.5);
-        }
-        driver.mecanumDriveForward(-25, 0.5);
+        driver.mecanumDriveForward(-25, SPEED);
 
 //        sleep(10000);
         if (getTfod() != null) {
@@ -144,15 +127,4 @@ public class DoubleSample extends AutonomousBaseOpMode {
         }
     }
 
-//    @Override
-//    public void stop(){
-//
-//    }
-    /**
-     * Initialize the Vuforia localization engine.
-     */
-
-    /**
-     * Initialize the Tensor Flow Object Detection engine.
-     */
 }

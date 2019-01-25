@@ -56,6 +56,7 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 
     public abstract void initb();

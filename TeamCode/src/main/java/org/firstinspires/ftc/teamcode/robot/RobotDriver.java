@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
@@ -10,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.UsesHardware;
+import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
+import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
 
 /**
  * Ultro
@@ -145,57 +148,6 @@ public class RobotDriver {
         mecanumDriveForward(-inches, speed);
     }
 
-    public void mechanumDriveRight(int inches, double speed){
-        //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
-        DcMotor leftBack = opmode.getLeftBackDrive();
-        DcMotor leftFront = opmode.getLeftFrontDrive();
-        DcMotor rightBack = opmode.getRightBackDrive();
-        DcMotor rightFront = opmode.getRightFrontDrive();
-        //</editor-fold>
-        int newleftBackTarget = leftBack.getCurrentPosition() - (int)(inches * DRIVE_COUNTS_PER_INCH);
-        int newrightFrontTarget = rightFront.getCurrentPosition() - (int)(inches * DRIVE_COUNTS_PER_INCH);
-        int newleftFrontTarget = leftFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
-        int newrightBackTarget = rightBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
-        if(inches < 0){
-            speed *= -1;
-        }
-        //<editor-fold desc="Setting to RUN_TO_POSITION">
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //</editor-fold>
-        //<editor-fold desc="Setting Target Positions">
-        leftBack.setTargetPosition(newleftBackTarget);
-        leftFront.setTargetPosition(newleftFrontTarget);
-        rightBack.setTargetPosition(newrightBackTarget);
-        rightFront.setTargetPosition(newrightFrontTarget);
-        //</editor-fold>
-        //<editor-fold desc="Setting Power">
-        leftFront.setPower(speed);
-        rightBack.setPower(speed);
-        //</editor-fold>
-        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
-            if(opmode instanceof OpMode){
-                ((OpMode) opmode).telemetry.addData("Speed", speed);
-                ((OpMode) opmode).telemetry.addData("Currently going:", "right");
-            }
-                telemetry.addData("Speed", speed);
-                telemetry.update();
-        }
-        //<editor-fold desc="Setting Power to 0">
-        leftBack.setPower(0);
-        rightFront.setPower(0);
-        leftFront.setPower(0);
-        rightBack.setPower(0);
-        //</editor-fold>
-        //<editor-fold desc="Setting to RUN_WITHOUT_ENCODER">
-        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //</editor-fold>
-    }
 
 
 
@@ -679,9 +631,19 @@ public class RobotDriver {
         THIS MUST BE DONE
          */
         this.opmode = opMode;
+        if(opMode instanceof AutonomousBaseOpMode || opMode instanceof LinearOpMode) {
+            Thread t = new Thread(new FindMineralRunnable());
+            if (!FindMineralRunnable.isAlreadyRunning()) {
+                t.start();
+            }
+        }
         if(opMode instanceof OpMode){
             this.telemetry = ((OpMode) opmode).telemetry;
         }
 
+    }
+
+    public UsesHardware getHardwareMap() {
+        return opmode;
     }
 }

@@ -1,11 +1,14 @@
-package org.firstinspires.ftc.teamcode.opmodes.autonomous.finalop.samples;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 import org.firstinspires.ftc.teamcode.util.Position;
+
+import java.util.List;
 
 /**
  * Ultro
@@ -25,10 +28,11 @@ public class GyroTurnTest extends AutonomousBaseOpMode {
     protected void prerun() {
         telemetry.addLine("Finding Orientation of the gold mineral");
         telemetry.update();
-        getBucket().setPosition(0.5);
+        //getBucket().setPosition(0.5);
         if (getTfod() != null) {
             getTfod().activate();
         }
+
         resetStartTime();
     }
     /*
@@ -37,6 +41,12 @@ public class GyroTurnTest extends AutonomousBaseOpMode {
     @Override
     protected void run() {
         driver.gyroTurn(180,0.45);
+        sleep(2500);
+        driver.gyroTurn(180,0.45);
+        sleep(2500);
+        driver.gyroTurn(90,0.45);
+        sleep(2500);
+        driver.gyroTurn(-90,0.45);
         /*
         if (opModeIsActive()) {
 

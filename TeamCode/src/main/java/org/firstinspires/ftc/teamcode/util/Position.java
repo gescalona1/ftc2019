@@ -5,7 +5,7 @@ package org.firstinspires.ftc.teamcode.util;
  */
 
 public enum Position {
-    LEFT("LEFT"), CENTER("CENTER"), RIGHT("RIGHT");
+    LEFT("LEFT"), CENTER("CENTER"), RIGHT("RIGHT"), NULL("NULL");
 
     private String name;
     Position(String name){

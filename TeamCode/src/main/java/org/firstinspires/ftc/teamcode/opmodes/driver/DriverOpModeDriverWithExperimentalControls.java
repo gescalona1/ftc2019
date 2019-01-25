@@ -107,13 +107,6 @@ public class DriverOpModeDriverWithExperimentalControls extends DriverBaseOpMode
             getRightpuldaun().setPower(-gamepad1.left_trigger);
             getLeftpuldaun().setPower(-gamepad1.left_trigger);
         }
-        if(gamepad2.dpad_down){
-            getIntake().setPower(1);
-        }else if(gamepad2.dpad_up){
-            getIntake().setPower(-1);
-        }else if(gamepad2.dpad_left){
-            getIntake().setPower(0);
-        }
 
         if (gamepad1.dpad_left || !lastgyro_spin) {
             lastgyro_spin = true;
