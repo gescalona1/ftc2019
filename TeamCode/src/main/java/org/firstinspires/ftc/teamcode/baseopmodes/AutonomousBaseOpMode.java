@@ -35,6 +35,7 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
         telemetry.update();
         prerun();
         waitForStart();
+        resetStartTime();
         run();
         RobotDriver.getDriver().setHardwareMap(null);
         if(isStopRequested()){

@@ -28,16 +28,17 @@ public class RobotDriver {
     private boolean gyroTurning = false;
     private Orientation currentAngle;
 
+    private final double  BAR_COUNTS_PER_MOTOR_REV  =    1120;
+    private final double  BAR_DRIVE_GEAR_REDUCTION  =   1;
+    private final double  BAR_WHEEL_DIAMETER_INCHES =   1.428;
+    private final double  BAR_COUNTS_PER_INCH       =   BAR_COUNTS_PER_MOTOR_REV * (BAR_DRIVE_GEAR_REDUCTION/BAR_WHEEL_DIAMETER_INCHES)
+            / (Math.PI*4);
+
     private final double DRIVE_COUNTS_PER_MOTOR_HEX  =    1120;
     private final double DRIVE_DRIVE_GEAR_REDUCTION  =   24 / 15;
     private final double DRIVE_WHEEL_DIAMETER_INCHES =   4;
-    private final double DRIVE_COUNTS_PER_INCH       =   DRIVE_COUNTS_PER_MOTOR_HEX * (DRIVE_DRIVE_GEAR_REDUCTION/DRIVE_WHEEL_DIAMETER_INCHES);
-
-    private final double  BAR_COUNTS_PER_MOTOR_REV  =    2240;
-    private final double  BAR_DRIVE_GEAR_REDUCTION  =   1;
-    private final double  BAR_WHEEL_DIAMETER_INCHES =   1.326;
-    private final double  BAR_COUNTS_PER_INCH       =   BAR_COUNTS_PER_MOTOR_REV * (BAR_DRIVE_GEAR_REDUCTION/BAR_WHEEL_DIAMETER_INCHES)
-                                                        / (Math.PI);
+    private final double DRIVE_COUNTS_PER_INCH       =   DRIVE_COUNTS_PER_MOTOR_HEX * (DRIVE_DRIVE_GEAR_REDUCTION/DRIVE_WHEEL_DIAMETER_INCHES)
+            / (Math.PI*4);
 
     /**
      * Updated mecanum drive function this year (math is ? ?? ? )
@@ -113,6 +114,7 @@ public class RobotDriver {
             if(opmode instanceof OpMode){
                 ((OpMode) opmode).telemetry.addData("Speed", speed);
                 ((OpMode) opmode).telemetry.addData("Currently going:", "right");
+                ((OpMode) opmode).telemetry.update();
             }
         }
         //<editor-fold desc="Setting Power to 0">
@@ -378,9 +380,15 @@ public class RobotDriver {
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void extendPullDownBar(int inches, int speed){
-        int newLeftTarget = opmode.getLeftpuldaun().getCurrentPosition() + (int)(inches * BAR_COUNTS_PER_INCH);
-        int newRightTarget = opmode.getRightpuldaun().getCurrentPosition() + (int)(inches * BAR_COUNTS_PER_INCH);
+    public void extendPullDownBar(double inches, double speed){
+        double aBAR_COUNTS_PER_MOTOR_REV  =    2240;
+        double aBAR_DRIVE_GEAR_REDUCTION  =   1;
+        double aBAR_WHEEL_DIAMETER_INCHES =   1.326;
+        double aBAR_COUNTS_PER_INCH       =   aBAR_COUNTS_PER_MOTOR_REV * (aBAR_DRIVE_GEAR_REDUCTION/aBAR_WHEEL_DIAMETER_INCHES)
+                / (Math.PI);
+
+        int newLeftTarget = opmode.getLeftpuldaun().getCurrentPosition() + (int)(inches * aBAR_COUNTS_PER_INCH);
+        int newRightTarget = opmode.getRightpuldaun().getCurrentPosition() + (int)(inches * aBAR_COUNTS_PER_INCH);
 
         opmode.getLeftpuldaun().setMode(DcMotor.RunMode.RUN_TO_POSITION);
         opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -397,6 +405,9 @@ public class RobotDriver {
                 ((OpMode) opmode).telemetry.addData("Current Position Right:", opmode.getRightpuldaun().getCurrentPosition());
                 ((OpMode) opmode).telemetry.addData("Expected Position Left :", newLeftTarget);
                 ((OpMode) opmode).telemetry.addData("Expected Position Right:", newRightTarget);
+                ((OpMode) opmode).telemetry.addData("Delta left Left:", Math.abs(newLeftTarget - opmode.getLeftpuldaun().getCurrentPosition()));
+                ((OpMode) opmode).telemetry.addData("Delta right Right:", Math.abs(newRightTarget - opmode.getRightpuldaun().getCurrentPosition()));
+                ((OpMode) opmode).telemetry.update();
             }
         }
         opmode.getLeftpuldaun().setPower(0);
@@ -410,46 +421,6 @@ public class RobotDriver {
         mecanumDriveLeft(-inches, speed);
     }
 
-    public void extendPullDownBar(double inches, double speed){
-        //<editor-fold desc="Motors: newLeftTarget, newRightTarget">
-        int newLeftTarget = opmode.getLeftpuldaun().getCurrentPosition() + (int)((inches * BAR_COUNTS_PER_INCH));
-        int newRightTarget = opmode.getRightpuldaun().getCurrentPosition() + (int)((inches * BAR_COUNTS_PER_INCH));
-        //</editor-fold>
-        //<editor-fold desc="Setting to RUN_TO_POSITION">
-        opmode.getLeftpuldaun().setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //</editor-fold>
-        //<editor-fold desc="Setting Target Positions">
-        opmode.getLeftpuldaun().setTargetPosition(newLeftTarget);
-        opmode.getRightpuldaun().setTargetPosition(newRightTarget);
-        //</editor-fold>
-        if (inches < 0){
-            speed *= -1;
-        }
-        //<editor-fold desc="Setting Power">
-        opmode.getLeftpuldaun().setPower(speed);
-        opmode.getRightpuldaun().setPower(speed);
-        //</editor-fold>
-        double pastTime = ((OpMode) opmode).getRuntime();
-        while(opmode.getLeftpuldaun().isBusy() && opmode.getRightpuldaun().isBusy()){
-            telemetry.addData("Current Position Left :", opmode.getLeftpuldaun().getCurrentPosition());
-            telemetry.addData("Current Position Right:", opmode.getRightpuldaun().getCurrentPosition());
-            telemetry.addData("Expected Position Left :", newLeftTarget);
-            telemetry.addData("Expected Position Right:", newRightTarget);
-            telemetry.update();
-            if(((OpMode) opmode).getRuntime() - pastTime >= 9){
-                break;
-            }
-        }
-        //<editor-fold desc="Setting Power to 0">
-        opmode.getLeftpuldaun().setPower(0);
-        opmode.getRightpuldaun().setPower(0);
-        //</editor-fold>
-        //<editor-fold desc="Setting RunMode to RUN_USING_ENCODER">
-        opmode.getLeftpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //</editor-fold>
-    }
 
     /**
      * Turns the machine using the built in imu, uses a thread to constantly check if the correct angle is met

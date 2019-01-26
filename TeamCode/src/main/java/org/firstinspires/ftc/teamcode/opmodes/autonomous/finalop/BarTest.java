@@ -27,21 +27,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.opmodes.autonomous;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous.finalop;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
-import org.firstinspires.ftc.teamcode.util.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
-
-import java.util.List;
+import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
+import org.firstinspires.ftc.teamcode.util.Position;
 
 /**
  * This 2018-2019 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -53,9 +46,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Double Sample", group = "auto")
+@Autonomous(name = "Bar Sample", group = "auto")
 //@Disabled
-public class DoubleSample extends AutonomousBaseOpMode {
+public class BarTest extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     public Position position = null;
     private final int CHECKS = 5;
@@ -72,17 +65,17 @@ public class DoubleSample extends AutonomousBaseOpMode {
     public void run() {
         int i = 0;
         position = FindMineralRunnable.getCurrentPosition();
-        while(true){
-            if(i >= CHECKS) {
+        while (true) {
+            if (i >= CHECKS) {
                 telemetry.addLine(String.format("Passed accuracy check: Position %s", position));
                 break;
             }
-            if(position == FindMineralRunnable.getCurrentPosition()) i++;
+            if (position == FindMineralRunnable.getCurrentPosition()) i++;
             else {
                 run();
                 return; // make sure it only runs this once
             }
-            if(getRuntime() > 5){ //if 5 seconds elapsed without it being accurate, just set it
+            if (getRuntime() > 5) { //if 5 seconds elapsed without it being accurate, just set it
                 position = FindMineralRunnable.getCurrentPosition();
                 position = (position == Position.NULL) ? position : Position.RIGHT;
                 telemetry.addLine("Runtime too long, going over");
@@ -94,41 +87,6 @@ public class DoubleSample extends AutonomousBaseOpMode {
         driver.extendPullDownBar(pullDownHeight, SPEED);
         driver.mecanumDriveLeft(5, 1);
         driver.mecanumDriveForward(-25, SPEED);
-        driver.extendPullDownBar(-pullDownHeight + 0.5, SPEED);
-        switch (position){
-            case RIGHT:
-                driver.mecanumDriveLeft(40, SPEED);
-                driver.mecanumDriveForward(-25, SPEED);
-                break;
-            case LEFT:
-                driver.mecanumDriveRight(40, SPEED);
-                driver.mecanumDriveForward(-25, SPEED);
-                break;
-            case CENTER:
-                driver.mecanumDriveForward(-25, SPEED);
-                break;
-        }
-        driver.mecanumDriveForward(25, SPEED);
-        driver.mecanumDriveRight(250, SPEED);
-        driver.mecanumDriveForward(200, SPEED);
-        driver.mecanumDriveRight(100, SPEED);
-        driver.mecanumDriveForward(-25, SPEED);
-        driver.mecanumDriveLeft(40, SPEED);
-        driver.turnRight(SPEED);
-        switch (position){
-            case LEFT:
-                driver.mecanumDriveLeft(40, SPEED);
-                break;
-            case RIGHT:
-                driver.mecanumDriveRight(40, SPEED);
-                break;
-        }
-        driver.mecanumDriveForward(-25, SPEED);
-
-//        sleep(10000);
-        if (getTfod() != null) {
-            getTfod().shutdown();
-        }
+        driver.extendPullDownBar(-pullDownHeight, SPEED);
     }
-
 }
