@@ -432,13 +432,6 @@ public class RobotDriver {
             if (angle == 0) {
                 return;
             }
-            if (angle > 360) {
-                angle = angle - 360;
-            } else if (angle > 0) {
-                angle = 360 - angle;
-            }
-            gyroTurning = true;
-            resetAngle();
             double leftfrontpower = 0, leftbackpower = 0, rightfrontpower = 0, rightbackpower = 0;
             if (angle < 0) {
                 leftfrontpower = -power;
@@ -451,6 +444,20 @@ public class RobotDriver {
                 rightfrontpower = -power;
                 rightbackpower = -power;
             }
+
+            if (angle > 360) {
+                angle = angle - 360;
+                gyroTurn(angle, power);
+                return; //make sure this is run once
+
+            } else if (angle > 0) {
+                angle = 360 - angle;
+            }else if(angle < 0){
+                angle = Math.abs(angle);
+            }
+            gyroTurning = true;
+            resetAngle();
+
             final float qangle = angle;
             int i = 0;
             opmode.getLeftFrontDrive().setPower(leftfrontpower);
