@@ -99,51 +99,29 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
             getLeftpuldaun().setPower(0);
         }
 
-        if(gamepad1.right_trigger > 0){
-            getRotate().setPower(gamepad1.right_trigger);
-        } else if(gamepad1.left_trigger > 0){
-            getRotate().setPower(-gamepad1.left_trigger);
-        } else {
-            getRotate().setPower(0);
-        }
+        if(gamepad1.right_trigger > 0) getRotate().setPower(gamepad1.right_trigger);
+        else if(gamepad1.left_trigger > 0) getRotate().setPower(-gamepad1.left_trigger);
+        else getRotate().setPower(0);
 
-        if(gamepad1.y){
-            getExtend().setPower(1);
-        } else if(gamepad1.a){
-            getExtend().setPower(-1);
-        } else {
-            getExtend().setPower(0);
-        }
+        if(gamepad1.y || gamepad2.y) getExtend().setPower(1);
+        else if(gamepad1.a || gamepad2.a) getExtend().setPower(-1);
+        else getExtend().setPower(0);
 
-        if(gamepad1.x){
+        if(gamepad1.x || gamepad2.x){
+            getBucket().setPosition(0);
+        }else if (gamepad1.b || gamepad2.b){
+            getBucket().setPosition(0.35);
+        }else getBucket().setPosition(0.5);
+
+        if(gamepad1.dpad_up || gamepad2.dpad_up){
             getIntake().setPosition(0);
-        } else if(gamepad1.b){
+        } else if(gamepad1.dpad_down || gamepad2.dpad_down){
             getIntake().setPosition(1);
         } else{
             getIntake().setPosition(0.5);
         }
+        getMarker().setPosition((gamepad2.left_bumper) ? 1 : 0.35);
 
-
-
-
-        // Tank Mode uses one stick to control each wheel.
-        // - This requires no math, but it is hard to drive forward slowly and keep straight.
-        // leftPower  = -gamepad1.left_stick_y ;
-        // rightPower = -gamepad1.right_stick_y ;
-
-        // Send calculated power to wheels
-
-
-        // Show the elapsed game time and wheel power.
-        /*
-        telemetry.addData("A button", gamepad1.a);
-        telemetry.addData("Angle", RobotDriver.getDriver().getAngle());
-        telemetry.addData("CurrentAngle", RobotDriver.getDriver().getCurrentAngle());
-        telemetry.addData("RelativeAngle", RobotDriver.getDriver().getRelativeAngle());
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)");
-        telemetry.update();
-        */
     }
 
     /*

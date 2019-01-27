@@ -42,6 +42,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
+import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
+import org.firstinspires.ftc.teamcode.util.Position;
 
 import java.util.List;
 
@@ -59,177 +61,89 @@ import java.util.List;
 //@Disabled
 public class MarkerSample extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
-    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
-    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
-    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
-    public static String position = null;
-
-    /*
-     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
-     * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
-     * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
-     * web site at https://developer.vuforia.com/license-manager.
-     *
-     * Vuforia license keys are always 380 characters long, and look as if they contain mostly
-     * random data. As an example, here is a example of a fragment of a valid key:
-     *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
-     * Once you've obtained a license key, copy the string from the Vuforia web site
-     * and paste it in to your code on the next line, between the double quotes.
-     */
-    private static final String VUFORIA_KEY = "AQJ+S07/////AAABmWogoCc6pUaIgJr0PQTfeCs5lGzeIINixSigiQAgCuEM72vPgehm+xef4CR6dR64HWXxwgHh/srsC0/P0SxUiYRAbW8Vk77QuzFauPZsRqvhxgTmha9jzsVLidmouW0VP2OBK/6BuSJ2IA5KHXofqR0zn0dN4lykvQp4IhJOwIaCosroAM8+bz8DpJr77pD4Z13uypItkuEBB8GuebhVuCvAK7IHj20ZIOzV850SaC1i4DH+3DbQkwprOw60ixF+PUc8DDCZmHhyS9RokUzgByYyqSG2bRiHwsEdqOVDAAoFd0Vt/fnPBRsXyK0uSyvERH+V/3ux0cH/SAFjjXxF2wMN7hUR215Qjh/jp7SoLIA7";
-
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
-    private VuforiaLocalizer vuforia;
-
-    /**
-     * {@link #tfod} is the variable we will use to store our instance of the Tensor Flow Object
-     * Detection engine.
-     */
-    private TFObjectDetector tfod;
+    public Position position = null;
+    private final int CHECKS = 5;
 
     @Override
     protected void prerun() {
-        telemetry.addLine("Ready");
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
-        initVuforia();
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
-
-        /** Wait for the game to begin */
-
-//        if (opModeIsActive()) {
-        /** Activate Tensor Flow Object Detection. */
-        if (tfod != null) {
-            tfod.activate();
-        }
-
-        while (!opModeIsActive()) {
-            if (tfod != null) {
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    if (updatedRecognitions.size() == 3) {
-                        int goldMineralX = -1;
-                        int silverMineral1X = -1;
-                        int silverMineral2X = -1;
-                        for (Recognition recognition : updatedRecognitions) {
-                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-                                goldMineralX = (int) recognition.getLeft();
-                            } else if (silverMineral1X == -1) {
-                                silverMineral1X = (int) recognition.getLeft();
-                            } else {
-                                silverMineral2X = (int) recognition.getLeft();
-                            }
-                        }
-                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                telemetry.addData("Gold Mineral Position", "Left");
-                                position = "Left";
-                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                telemetry.addData("Gold Mineral Position", "Right");
-                                position = "Right";
-                            } else {
-                                telemetry.addData("Gold Mineral Position", "Center");
-                                position = "Center";
-                            }
-                        }
-                    }
-                    telemetry.update();
-                }
-//                }
-            }
-        }
-        telemetry.update();
+        FindMineralRunnable.setRecordData(true);
+        resetStartTime();
     }
 
     @Override
     public void run() {
-        telemetry.addData("Position", position);
+        int i = 0;
+        position = FindMineralRunnable.getCurrentPosition();
+        while (true) {
+            if (i >= CHECKS) {
+                telemetry.addLine(String.format("Passed accuracy check: Position %s", position));
+                break;
+            }
+            if (position == FindMineralRunnable.getCurrentPosition()) i++;
+            else {
+                run();
+                return; // make sure it only runs this once
+            }
+            if (getRuntime() > 5) { //if 5 seconds elapsed without it being accurate, just set it
+                position = FindMineralRunnable.getCurrentPosition();
+                position = (position == Position.NULL) ? position : Position.RIGHT;
+                telemetry.addLine("Runtime too long, going over");
+                break;
+            }
+        }
+        FindMineralRunnable.setRecordData(false);
         telemetry.update();
-        if (position == "Right") {
-            driver.mecanumDriveForward(-25, 0.5);
-            driver.mecanumDriveLeft(40, 1);
-            driver.mecanumDriveForward(-50, 0.5);
-            driver.turnLeft(0.5);
-            driver.mecanumDriveForward(-40, 0.5);
-            //Team Marker
-            driver.turnLeft(0.5);
-            driver.turnLeft(0.5);
-            driver.turnLeft(0.5);
-            driver.mecanumDriveForward(100, 0.5);
-            driver.mecanumDriveLeft(150, 1);
+        switch (position) {
+            case RIGHT:
+                driver.mecanumDriveForward(-25, 0.5);
+                driver.mecanumDriveLeft(40, 1);
+                driver.mecanumDriveForward(-50, 0.5);
+                driver.turnLeft(0.5);
+                driver.mecanumDriveForward(-40, 0.5);
+                //Team Marker
+                getMarker().setPosition(0);
+                sleep(2500);
+                getMarker().setPosition(0.35);
 
-        }
-        if (position == "Left") {
-            driver.mecanumDriveForward(-25, 0.5);
-            driver.mecanumDriveRight(60, 1);
-            driver.mecanumDriveForward(-50, 0.5);
-            driver.turnLeft(0.5);
-            driver.mecanumDriveForward(-40, 0.5);
-            //Team Marker
-            driver.turnLeft(0.5);
-            driver.turnLeft(0.5);
-            driver.turnLeft(0.5);
-            driver.mecanumDriveForward(100, 0.5);
-            driver.mecanumDriveLeft(150, 1);
-        }
-        if (position == "Center") {
-            driver.mecanumDriveForward(-25, 0.5);
-            driver.mecanumDriveForward(-50, 0.5);
-            driver.mecanumDriveForward(-40, 0.5);
-            //Team Marker
-            driver.turnLeft(0.5);
-            driver.turnLeft(0.5);
-            driver.turnLeft(0.5);
-            driver.mecanumDriveForward(100, 0.5);
-            driver.mecanumDriveLeft(150, 1);
+                driver.turnLeft(0.5);
+                driver.turnLeft(0.5);
+                driver.turnLeft(0.5);
+                driver.mecanumDriveForward(100, 0.5);
+                driver.mecanumDriveLeft(150, 1);
+                break;
+            case LEFT:
+                driver.mecanumDriveForward(-25, 0.5);
+                driver.mecanumDriveRight(60, 1);
+                driver.mecanumDriveForward(-50, 0.5);
+                driver.turnLeft(0.5);
+                driver.mecanumDriveForward(-40, 0.5);
+                //Team Marker
+                getMarker().setPosition(0);
+                sleep(2500);
+                getMarker().setPosition(0.35);
+
+                driver.turnLeft(0.5);
+                driver.turnLeft(0.5);
+                driver.turnLeft(0.5);
+                driver.mecanumDriveForward(100, 0.5);
+                driver.mecanumDriveLeft(150, 1);
+                break;
+            case CENTER:
+                driver.mecanumDriveForward(-25, 0.5);
+                driver.mecanumDriveForward(-50, 0.5);
+                driver.mecanumDriveForward(-40, 0.5);
+                //Team Marker
+                getMarker().setPosition(0);
+                sleep(2500);
+                getMarker().setPosition(0.35);
+
+                driver.turnLeft(0.5);
+                driver.turnLeft(0.5);
+                driver.turnLeft(0.5);
+                driver.mecanumDriveForward(100, 0.5);
+                driver.mecanumDriveLeft(150, 1);
+                break;
         }
         driver.mecanumDriveForward(-200, 0.5);
-//        sleep(10000);
-        if (tfod != null) {
-            tfod.shutdown();
-        }
-    }
-
-//    @Override
-//    public void stop(){
-//
-//    }
-    /**
-     * Initialize the Vuforia localization engine.
-     */
-    private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
-    }
-
-    /**
-     * Initialize the Tensor Flow Object Detection engine.
-     */
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
 }

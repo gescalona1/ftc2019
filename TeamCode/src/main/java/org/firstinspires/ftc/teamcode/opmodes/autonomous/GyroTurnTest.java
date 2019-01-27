@@ -40,13 +40,13 @@ public class GyroTurnTest extends AutonomousBaseOpMode {
      */
     @Override
     protected void run() {
-        driver.gyroTurn(180,0.45);
+        driver.gyroTurn(180,0.5, 5);
         sleep(2500);
-        driver.gyroTurn(180,0.45);
+        driver.gyroTurn(180,0.5, 5);
         sleep(2500);
-        driver.gyroTurn(90,0.45);
+        driver.gyroTurn(90,0.5, 5);
         sleep(2500);
-        driver.gyroTurn(-90,0.45);
+        driver.gyroTurn(-90,0.5,5 );
         /*
         if (opModeIsActive()) {
 
