@@ -21,18 +21,13 @@ import java.util.List;
 public class GyroTurnTest extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
+    private double originalAngle;
     /*
     Before waitforStart()
      */
     @Override
     protected void prerun() {
-        telemetry.addLine("Finding Orientation of the gold mineral");
-        telemetry.update();
-        //getBucket().setPosition(0.5);
-        if (getTfod() != null) {
-            getTfod().activate();
-        }
-
+        originalAngle = driver.correctAngle(driver.getCurrentAngle()); // stores the original angle, for later
         resetStartTime();
     }
     /*
@@ -40,12 +35,12 @@ public class GyroTurnTest extends AutonomousBaseOpMode {
      */
     @Override
     protected void run() {
+        driver.gyroTurn(originalAngle, 0.5);
+        sleep(6000);
         driver.gyroTurn(180,0.5, 5);
-        sleep(2500);
-        driver.gyroTurn(180,0.5, 5);
-        sleep(2500);
+        sleep(3500);
         driver.gyroTurn(90,0.5, 5);
-        sleep(2500);
+        sleep(3500);
         driver.gyroTurn(-90,0.5,5 );
         /*
         if (opModeIsActive()) {

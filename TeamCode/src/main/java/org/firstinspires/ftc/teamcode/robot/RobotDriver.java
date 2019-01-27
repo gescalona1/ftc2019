@@ -423,108 +423,102 @@ public class RobotDriver {
 
 
     /**
-     * Turns the machine using the built in imu, uses a thread to constantly check if the correct angle is met
+     * Turns the machine using the built in imu, constantly checks if the correct angle is met
      * @param angle required angle to rotate [-180, 180]
      * @param power how much speed will the robot move
+     * @param CORRECT_ANGLE_RANGE to the extent of how much it will check if it achieves the angle
      */
-    public void gyroTurn(float angle, double power, final double CORRECT_ANGLE_RANGE){
-        if(!gyroTurning) {
-            if (angle == 0) {
-                return;
+    public void gyroTurn(double angle, double power, final double CORRECT_ANGLE_RANGE){
+        if(!gyroTurning) { // to make sure gyroTurn is not called again while it is already being done
+            if (angle == 0) return; // if the angle is 0, just don't do anything
+            if (angle >= 360) {
+                /*
+                    if the angle is more than 360, just subtract 360
+                    to avoid going into a full circle and
+                    re-run the function
+                 */
+                angle = angle - 360;
+                gyroTurn(angle, power);
+                return; //make sure this is ran once
             }
+            // initiates powers
             double leftfrontpower = 0, leftbackpower = 0, rightfrontpower = 0, rightbackpower = 0;
             if (angle < 0) {
+                /*
+                    If the angle goes to the left,
+                    set the positive power to the right side and set the negative power to left side.
+                    This allows the robot to rotate left.
+                */
                 leftfrontpower = -power;
                 leftbackpower = -power;
                 rightfrontpower = power;
                 rightbackpower = power;
             } else if (angle > 0) {
+                /*
+                    If the angle goes to the right,
+                    set the positive power to the left side and set the negative power to right side.
+                    This allows the robot to rotate right.
+                */
                 leftfrontpower = power;
                 leftbackpower = power;
                 rightfrontpower = -power;
                 rightbackpower = -power;
             }
-
-            if (angle > 360) {
-                angle = angle - 360;
-                gyroTurn(angle, power);
-                return; //make sure this is run once
-
-            } else if (angle > 0) {
+            if (angle > 0) {
+                /*
+                    Since the imu gyro goes from -pi to pi (-180 to 180, where 0 is the center),
+                    what we did was translate the output
+                    so that it becomes a range of 0-359 (counter-clockwise).
+                 */
                 angle = 360 - angle;
             }else if(angle < 0){
+                /*
+                    If the angle is negative, adjust accordingly
+                 */
                 angle = Math.abs(angle);
             }
             gyroTurning = true;
-            resetAngle();
-
-            final float qangle = angle;
-            int i = 0;
+            resetAngle(); //setting the angle to 0, so that we can easily check for the difference
+            //Setting powers
             opmode.getLeftFrontDrive().setPower(leftfrontpower);
             opmode.getLeftBackDrive().setPower(leftbackpower);
             opmode.getRightFrontDrive().setPower(rightfrontpower);
             opmode.getRightBackDrive().setPower(rightbackpower);
-            /*
-            if qangle = 90
-            102.5 > relativeangle of 90 > 77.5 == true
+            int i = 0; //See later code
+            final double qangle = angle;
+            /* Sample simulation
+            if qangle = 90 and CORRECT_ANGLE_RANGE = 2.5
+            92.5 > relativeangle of 90 > 87.5 == true
             true = while loop breaks
             false = while loop still goes
              */
-            while(!(qangle + CORRECT_ANGLE_RANGE > getRelativeAngle() && getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE)){
-                telemetry.addData("continue", !(qangle + CORRECT_ANGLE_RANGE > getRelativeAngle() && getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE));
+            while(!(qangle + CORRECT_ANGLE_RANGE > getRelativeAngle() &&
+                    getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE)){
+                /*
+                    Below is just telemetry output so that we can see what's happening
+                 */
+                telemetry.addData("continue", !(qangle + CORRECT_ANGLE_RANGE >
+                        getRelativeAngle() && getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE));
                 telemetry.addData("relative angle", getRelativeAngle());
-                telemetry.addData("requiredAngle with correction", (qangle - CORRECT_ANGLE_RANGE) + " to " + (qangle + CORRECT_ANGLE_RANGE));
+                telemetry.addData("requiredAngle with correction",
+                        (qangle - CORRECT_ANGLE_RANGE) + " to " + (qangle + CORRECT_ANGLE_RANGE));
                 telemetry.addData("difference actual", Math.abs(getRelativeAngle() - qangle));
                 telemetry.addData("checked how many times:", i);
                 telemetry.update();
                 if(i >= 1500) {
-                    break;
+                    break; //if it checks too many times, break out
                 }
                 i++;
             }
+            // Cleaning up, setting motors' powers to 0
             opmode.getLeftFrontDrive().setPower(0);
             opmode.getLeftBackDrive().setPower(0);
             opmode.getRightFrontDrive().setPower(0);
             opmode.getRightBackDrive().setPower(0);
             gyroTurning = false;
-            /*
-            Thread t = new Thread(new Runnable() {
-                private volatile boolean running = true;
-                private final int requiredAngle = qangle;
-                @Override
-                public void run() {
-                    int i = 0;
-                    opmode.getLeftFrontDrive().setPower(leftfrontpower);
-                    opmode.getLeftBackDrive().setPower(leftbackpower);
-                    opmode.getRightFrontDrive().setPower(rightfrontpower);
-                    opmode.getRightBackDrive().setPower(rightbackpower);
-                    while (running) {
-                        if (opmode instanceof OpMode) {
-                            ((OpMode) opmode).telemetry.addData("difference", getRelativeAngle());
-                            ((OpMode) opmode).telemetry.addData("requiredAngle with correction", (requiredAngle - CORRECT_ANGLE_RANGE) + " to " + (requiredAngle + CORRECT_ANGLE_RANGE));
-                            ((OpMode) opmode).telemetry.addData("difference boolean", (getRelativeAngle() > requiredAngle + CORRECT_ANGLE_RANGE && getRelativeAngle() < requiredAngle - CORRECT_ANGLE_RANGE));
-                            ((OpMode) opmode).telemetry.addData("checked how many times:", i);
-                            ((OpMode) opmode).telemetry.update();
-                        }
-                        if (getRelativeAngle() > requiredAngle - CORRECT_ANGLE_RANGE && getRelativeAngle() < requiredAngle + CORRECT_ANGLE_RANGE) {
-                            running = false;
-                            opmode.getLeftFrontDrive().setPower(0);
-                            opmode.getLeftBackDrive().setPower(0);
-                            opmode.getRightFrontDrive().setPower(0);
-                            opmode.getRightBackDrive().setPower(0);
-                            gyroTurning = false;
-                            return;
-                        }
-                        i++;
-                    }
-                }
-
-            });
-            ThreadManager.getInstance().addThread(t);
-            t.start();*/
         }
     }
-    public void gyroTurn(float angle, double power){
+    public void gyroTurn(double angle, double power){
         this.gyroTurn(angle, power, 2.5);
     }
     /**
