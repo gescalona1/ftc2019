@@ -1,19 +1,13 @@
 package org.firstinspires.ftc.teamcode.baseopmodes;
 
-import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Hardware;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.UsesHardware;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
@@ -139,7 +133,7 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
 
     @Override
     public final VuforiaLocalizer getVuforia() {
-        return map.getVuforia();
+        return map.getPhoneVuforia();
     }
 
     @Override
@@ -157,4 +151,8 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
         return map.getLabelSilverMineral();
     }
 
+    @Override
+    public VuforiaTrackable getRelicTemplate() {
+        return map.getRelicTemplate();
+    }
 }

@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 /**
@@ -38,6 +39,8 @@ public interface UsesHardware {
     int getCameraViewId();
     VuforiaLocalizer getVuforia();
     TFObjectDetector getTfod();
+
+    VuforiaTrackable getRelicTemplate();
 
     String getTfodModelAsset();
     String getLabelGoldMineral();

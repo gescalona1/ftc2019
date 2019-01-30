@@ -21,16 +21,21 @@ public final class FindMineralRunnable implements Runnable {
     private static Position position;
     private static boolean alreadyRunning;
     private static boolean recordData;
-
+    private static boolean stop = false;
     @Override
     public void run() {
         //Get current Hardware Map
         alreadyRunning = true;
-        while (true) {
-            UsesHardware usesHardware = RobotDriver.getDriver().getHardwareMap();
-            OpMode opMode = (OpMode) usesHardware;
-            if (usesHardware != null && usesHardware instanceof LinearOpMode) {
-                if(!((LinearOpMode) usesHardware).opModeIsActive()) return;
+        UsesHardware usesHardware = RobotDriver.getDriver().getHardwareMap();
+        OpMode opMode = (OpMode) usesHardware;
+        if (usesHardware != null && usesHardware instanceof LinearOpMode) {
+            LinearOpMode linearOpMode = (LinearOpMode) usesHardware;
+            while (!linearOpMode.opModeIsActive()) {
+                linearOpMode = (LinearOpMode) RobotDriver.getDriver().getHardwareMap();
+                if(stop || linearOpMode.isStopRequested() || RobotDriver.getDriver().getHardwareMap() == null) {
+                    alreadyRunning = false;
+                    return;
+                }
                 TFObjectDetector tfod = ((UsesHardware) opMode).getTfod();
                 tfod.activate();
                 if (tfod != null) {
@@ -69,11 +74,11 @@ public final class FindMineralRunnable implements Runnable {
                         }
                     }
                 }
-            } else {
-                TFObjectDetector tfod = ((UsesHardware) opMode).getTfod();
-                tfod.deactivate();
-                return;
             }
+            alreadyRunning = false;
+        }else {
+            TFObjectDetector tfod = ((UsesHardware) opMode).getTfod();
+            tfod.deactivate();
         }
     }
 
@@ -92,5 +97,12 @@ public final class FindMineralRunnable implements Runnable {
 
     public static void setRecordData(boolean recordData) {
         FindMineralRunnable.recordData = recordData;
+    }
+
+    public static void reset(){
+        stop = false;
+    }
+    public static void forceStop(){
+        stop = true;
     }
 }

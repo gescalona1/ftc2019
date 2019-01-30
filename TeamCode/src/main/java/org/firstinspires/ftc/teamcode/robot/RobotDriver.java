@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -35,7 +36,7 @@ public class RobotDriver {
             / (Math.PI*4);
 
     private final double DRIVE_COUNTS_PER_MOTOR_HEX  =    1120;
-    private final double DRIVE_DRIVE_GEAR_REDUCTION  =   24 / 15;
+    private final double DRIVE_DRIVE_GEAR_REDUCTION  =   15 / 24;
     private final double DRIVE_WHEEL_DIAMETER_INCHES =   4;
     private final double DRIVE_COUNTS_PER_INCH       =   DRIVE_COUNTS_PER_MOTOR_HEX * (DRIVE_DRIVE_GEAR_REDUCTION/DRIVE_WHEEL_DIAMETER_INCHES)
             / (Math.PI*4);
@@ -143,14 +144,12 @@ public class RobotDriver {
         rightBack.setPower(speed);
     }
 
-    public void mecanumDriveBackward(double speed){
-        mecanumDriveForward(-speed);
-    }
     public void mecanumDriveBackward(int inches, double speed){
         mecanumDriveForward(-inches, speed);
     }
-
-
+    public void mecanumDriveBackward(double speed){
+        mecanumDriveForward(-speed);
+    }
 
 
     public void mecanumDriveLeft(int inches, double speed) {
@@ -188,196 +187,25 @@ public class RobotDriver {
         while (leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()) {
             if (opmode instanceof OpMode) {
                 ((OpMode) opmode).telemetry.addData("Speed", speed);
-                ((OpMode) opmode).telemetry.addData("Currently going:", "left");
+                ((OpMode) opmode).telemetry.addData("Currently going: ", (inches < 0) ? "right" : "left");
             }
-            leftBack.setPower(-speed);
-            rightFront.setPower(-speed);
-            leftFront.setPower(speed);
-            rightBack.setPower(speed);
-            //</editor-fold>
-            while (leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()) {
-                telemetry.addData("newleftBackTarget", newleftBackTarget);
-                telemetry.addData("newleftBackTarget", newrightFrontTarget);
-                telemetry.addData("newleftBackTarget", newleftFrontTarget);
-                telemetry.addData("newleftBackTarget", newrightBackTarget);
-                telemetry.addData("Speed", speed);
-                telemetry.update();
-            }
-            //<editor-fold desc="Setting Power to 0">
-            leftBack.setPower(0);
-            rightFront.setPower(0);
-            leftFront.setPower(0);
-            rightBack.setPower(0);
-            //</editor-fold>
-            //<editor-fold desc="Setting to RUN_WITHOUT_ENCODER">
-
-            //</editor-fold>
         }
-    }
-    public void encoderTurnLeft45(double speed){
-        DcMotor leftBack = opmode.getLeftBackDrive();
-        DcMotor leftFront = opmode.getLeftFrontDrive();
-        DcMotor rightBack = opmode.getRightBackDrive();
-        DcMotor rightFront = opmode.getRightFrontDrive();
-
         //</editor-fold>
-        int newleftBackTarget = leftBack.getCurrentPosition() - (int)(40 * DRIVE_COUNTS_PER_INCH);
-        int newrightFrontTarget = rightFront.getCurrentPosition() + (int)(40 * DRIVE_COUNTS_PER_INCH);
-        int newleftFrontTarget = leftFront.getCurrentPosition() - (int)(40 * DRIVE_COUNTS_PER_INCH);
-        int newrightBackTarget = rightBack.getCurrentPosition() + (int)(40 * DRIVE_COUNTS_PER_INCH);
-
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        leftBack.setTargetPosition(newleftBackTarget);
-        leftFront.setTargetPosition(newleftFrontTarget);
-        rightBack.setTargetPosition(newrightBackTarget);
-        rightFront.setTargetPosition(newrightFrontTarget);
-
-        leftBack.setPower(speed);
-        rightFront.setPower(speed);
-        leftFront.setPower(speed);
-        rightBack.setPower(speed);
-
-        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
-            if(opmode instanceof OpMode){
-                ((OpMode) opmode).telemetry.addData("Speed", speed);
-                ((OpMode) opmode).telemetry.addData("Currently going:", "Turning");
-            }
-        }
         //<editor-fold desc="Setting Power to 0">
         leftBack.setPower(0);
         rightFront.setPower(0);
         leftFront.setPower(0);
         rightBack.setPower(0);
+        //</editor-fold>
+
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
-
-    public void turnLeft(double speed){
-        int newLeftTarget;
-        int newRightTarget;
-        int newLeftBottomTarget;
-        int newRightBottomTarget;
-        DcMotor leftBack = opmode.getLeftBackDrive();
-        DcMotor leftFront = opmode.getLeftFrontDrive();
-        DcMotor rightBack = opmode.getRightBackDrive();
-        DcMotor rightFront = opmode.getRightFrontDrive();
-
-        // Determine new target position, and pass to motor controller
-        newLeftTarget = leftFront.getCurrentPosition() + (int)(20 * DRIVE_COUNTS_PER_INCH);
-        newLeftBottomTarget = leftBack.getCurrentPosition() + (int)(20 * DRIVE_COUNTS_PER_INCH);
-        newRightTarget = rightFront.getCurrentPosition() + (int)(-20 * DRIVE_COUNTS_PER_INCH);
-        newRightBottomTarget = rightBack.getCurrentPosition() + (int)(-20 * DRIVE_COUNTS_PER_INCH);
-        leftFront.setTargetPosition(newLeftTarget);
-        leftBack.setTargetPosition(newLeftBottomTarget);
-        rightFront.setTargetPosition(newRightTarget);
-        rightBack.setTargetPosition(newRightBottomTarget);
-
-        // Turn On RUN_TO_POSITION
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        // reset the timeout time and start motion.
-//        runtime.reset();
-        leftFront.setPower(Math.abs(speed));
-        leftBack.setPower(Math.abs(speed));
-        rightFront.setPower(Math.abs(speed));
-        rightBack.setPower(Math.abs(speed));
-
-        // keep looping while we are still active, and there is time left, and both motors are running.
-        // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
-        // its target position, the motion will stop.  This is "safer" in the event that the robot will
-        // always end the motion as soon as possible.
-        // However, if you require that BOTH motors have finished their moves before the robot continues
-        // onto the next step, use (isBusy() || isBusy()) in the loop test.
-
-        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
-            if(opmode instanceof OpMode){
-                ((OpMode) opmode).telemetry.addData("Speed", speed);
-                ((OpMode) opmode).telemetry.addData("Currently going:", "Turning");
-            }
-            ((OpMode) opmode).telemetry.update();
-        }
-        // Stop all motion;
-        leftFront.setPower(0);
-        leftBack.setPower(0);
-        rightFront.setPower(0);
-        rightBack.setPower(0);
-
-        // Turn off RUN_TO_POSITION
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    public void turnRight(double speed){
-        int newLeftTarget;
-        int newRightTarget;
-        int newLeftBottomTarget;
-        int newRightBottomTarget;
-        DcMotor leftBack = opmode.getLeftBackDrive();
-        DcMotor leftFront = opmode.getLeftFrontDrive();
-        DcMotor rightBack = opmode.getRightBackDrive();
-        DcMotor rightFront = opmode.getRightFrontDrive();
-
-        // Determine new target position, and pass to motor controller
-        newLeftTarget = leftFront.getCurrentPosition() + (int)(-20 * DRIVE_COUNTS_PER_INCH);
-        newLeftBottomTarget = leftBack.getCurrentPosition() + (int)(-20 * DRIVE_COUNTS_PER_INCH);
-        newRightTarget = rightFront.getCurrentPosition() + (int)(20 * DRIVE_COUNTS_PER_INCH);
-        newRightBottomTarget = rightBack.getCurrentPosition() + (int)(20 * DRIVE_COUNTS_PER_INCH);
-        leftFront.setTargetPosition(newLeftTarget);
-        leftBack.setTargetPosition(newLeftBottomTarget);
-        rightFront.setTargetPosition(newRightTarget);
-        rightBack.setTargetPosition(newRightBottomTarget);
-
-        // Turn On RUN_TO_POSITION
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        // reset the timeout time and start motion.
-//        runtime.reset();
-        leftFront.setPower(Math.abs(speed));
-        leftBack.setPower(Math.abs(speed));
-        rightFront.setPower(Math.abs(speed));
-        rightBack.setPower(Math.abs(speed));
-
-        // keep looping while we are still active, and there is time left, and both motors are running.
-        // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
-        // its target position, the motion will stop.  This is "safer" in the event that the robot will
-        // always end the motion as soon as possible.
-        // However, if you require that BOTH motors have finished their moves before the robot continues
-        // onto the next step, use (isBusy() || isBusy()) in the loop test.
-
-        while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
-            if(opmode instanceof OpMode){
-                ((OpMode) opmode).telemetry.addData("Speed", speed);
-                ((OpMode) opmode).telemetry.addData("Currently going:", "Turning");
-            }
-            ((OpMode) opmode).telemetry.update();
-        }
-        // Stop all motion;
-        leftFront.setPower(0);
-        leftBack.setPower(0);
-        rightFront.setPower(0);
-        rightBack.setPower(0);
-
-        // Turn off RUN_TO_POSITION
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    public void mecanumDriveRight(int inches, double speed){
+        mecanumDriveLeft(-inches, speed);
     }
 
     public void extendPullDownBar(double inches, double speed){
@@ -417,8 +245,20 @@ public class RobotDriver {
         opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void mecanumDriveRight(int inches, double speed){
-        mecanumDriveLeft(-inches, speed);
+    public void mecanumDriveRight(double speed){
+        //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
+        DcMotor leftBack = opmode.getLeftBackDrive();
+        DcMotor leftFront = opmode.getLeftFrontDrive();
+        DcMotor rightBack = opmode.getRightBackDrive();
+        DcMotor rightFront = opmode.getRightFrontDrive();
+        //</editor-fold>
+        leftBack.setPower(speed);
+        rightFront.setPower(speed);
+        leftFront.setPower(-speed);
+        rightBack.setPower(-speed);
+    }
+    public void mecanumDriveLeft(double speed){
+        this.mecanumDriveRight(-speed);
     }
 
 
@@ -429,8 +269,16 @@ public class RobotDriver {
      * @param CORRECT_ANGLE_RANGE to the extent of how much it will check if it achieves the angle
      */
     public void gyroTurn(double angle, double power, final double CORRECT_ANGLE_RANGE){
+        if(opmode instanceof LinearOpMode){
+            if(((LinearOpMode) opmode).isStopRequested()) return;
+        }
         if(!gyroTurning) { // to make sure gyroTurn is not called again while it is already being done
             if (angle == 0) return; // if the angle is 0, just don't do anything
+            try { //Opmode sleep function
+                Thread.sleep(750);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             if (angle >= 360) {
                 /*
                     if the angle is more than 360, just subtract 360
@@ -443,7 +291,7 @@ public class RobotDriver {
             }
             // initiates powers
             double leftfrontpower = 0, leftbackpower = 0, rightfrontpower = 0, rightbackpower = 0;
-            if (angle < 0) {
+            if (angle > 0) {
                 /*
                     If the angle goes to the left,
                     set the positive power to the right side and set the negative power to left side.
@@ -453,7 +301,7 @@ public class RobotDriver {
                 leftbackpower = -power;
                 rightfrontpower = power;
                 rightbackpower = power;
-            } else if (angle > 0) {
+            } else if (angle < 0) {
                 /*
                     If the angle goes to the right,
                     set the positive power to the left side and set the negative power to right side.
@@ -603,16 +451,21 @@ public class RobotDriver {
         THIS MUST BE DONE
          */
         this.opmode = opMode;
-        if(opMode instanceof AutonomousBaseOpMode || opMode instanceof LinearOpMode) {
-            Thread t = new Thread(new FindMineralRunnable());
-            if (!FindMineralRunnable.isAlreadyRunning()) {
-                t.start();
-            }
-        }
         if(opMode instanceof OpMode){
             this.telemetry = ((OpMode) opmode).telemetry;
         }
+        if(opMode instanceof AutonomousBaseOpMode || opMode instanceof LinearOpMode) {
+            FindMineralRunnable.reset();
+            Thread t = new Thread(new FindMineralRunnable());
 
+            this.telemetry.addLine("Find Mineral starting thread");
+            if (!FindMineralRunnable.isAlreadyRunning()) {
+                t.start();
+                this.telemetry.addLine("Find Mineral is now running");
+            }
+
+        }
+        this.telemetry.addLine("Set hardware map was successful");
     }
 
     public UsesHardware getHardwareMap() {

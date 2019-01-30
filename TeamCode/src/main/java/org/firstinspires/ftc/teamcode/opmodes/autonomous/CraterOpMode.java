@@ -32,14 +32,14 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
-import org.firstinspires.ftc.teamcode.util.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
+import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
+import org.firstinspires.ftc.teamcode.util.Position;
 
 import java.util.List;
 
@@ -53,15 +53,13 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Double Sample", group = "auto")
+@Autonomous(name = "Crater Sample", group = "auto")
 //@Disabled
-public class DoubleSample extends AutonomousBaseOpMode {
-    RobotDriver driver = RobotDriver.getDriver();
-    public Position position = null;
+public class CraterOpMode extends AutonomousBaseOpMode {
+    private Position position = null;
     private final int CHECKS = 5;
-    private final double SPEED = 0.65;
+    private final double SPEED = 0.80;
     private final double pullDownHeight = 5.1;
-
     @Override
     protected void prerun() {
         FindMineralRunnable.setRecordData(true);
@@ -69,11 +67,12 @@ public class DoubleSample extends AutonomousBaseOpMode {
     }
 
     @Override
-    public void run() {
+    protected void run() {
         int i = 0;
         position = FindMineralRunnable.getCurrentPosition();
         while(true){
             if(i >= CHECKS) {
+                FindMineralRunnable.forceStop();
                 telemetry.addLine(String.format("Passed accuracy check: Position %s", position));
                 break;
             }
@@ -84,51 +83,50 @@ public class DoubleSample extends AutonomousBaseOpMode {
             }
             if(getRuntime() > 5){ //if 5 seconds elapsed without it being accurate, just set it
                 position = FindMineralRunnable.getCurrentPosition();
-                position = (position == Position.NULL) ? position : Position.RIGHT;
                 telemetry.addLine("Runtime too long, going over");
                 break;
             }
         }
+        driver.extendPullDownBar(pullDownHeight, 0.77d);
+        driver.gyroTurn(30, 0.5, 4.5);
+        driver.mecanumDriveForward(3, SPEED);
+        driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
+        driver.mecanumDriveForward(3, SPEED);
+
+        position = (position != null) ? position : Position.RIGHT;
         FindMineralRunnable.setRecordData(false);
-        telemetry.update();
-        driver.extendPullDownBar(pullDownHeight, SPEED);
-        driver.mecanumDriveLeft(5, 1);
-        driver.mecanumDriveForward(-25, SPEED);
-        driver.extendPullDownBar(-pullDownHeight + 0.5, SPEED);
-        switch (position){
-            case RIGHT:
-                driver.mecanumDriveLeft(40, SPEED);
-                driver.mecanumDriveForward(-25, SPEED);
-                break;
+        FindMineralRunnable.forceStop();
+
+        switch(position){
             case LEFT:
-                driver.mecanumDriveRight(40, SPEED);
-                driver.mecanumDriveForward(-25, SPEED);
-                break;
+                driver.mecanumDriveLeft(12, SPEED);
+                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
+                driver.mecanumDriveForward(9, SPEED);
+            case RIGHT:
+                driver.mecanumDriveRight(12, SPEED);
+                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
+                driver.mecanumDriveForward(9, SPEED);
             case CENTER:
-                driver.mecanumDriveForward(-25, SPEED);
-                break;
+                driver.mecanumDriveForward(9, SPEED);
+            case NULL:
+                driver.mecanumDriveForward(9, SPEED);
         }
-        driver.mecanumDriveForward(25, SPEED);
-        driver.mecanumDriveRight(250, SPEED);
-        driver.mecanumDriveForward(200, SPEED);
-        driver.mecanumDriveRight(100, SPEED);
-        driver.mecanumDriveForward(-25, SPEED);
-        driver.mecanumDriveLeft(40, SPEED);
-        driver.turnRight(SPEED);
-        switch (position){
-            case LEFT:
-                driver.mecanumDriveLeft(40, SPEED);
-                break;
-            case RIGHT:
-                driver.mecanumDriveRight(40, SPEED);
-                break;
-        }
-        driver.mecanumDriveForward(-25, SPEED);
 
-//        sleep(10000);
-        if (getTfod() != null) {
-            getTfod().shutdown();
-        }
+        driver.mecanumDriveBackward(-12, SPEED);
+        driver.gyroTurn(180, 0.5,4.5);
+        driver.mecanumDriveRight(14, SPEED); //distance
+        driver.mecanumDriveRight(1);
+        sleep(1500);
+        driver.mecanumDriveLeft(1, SPEED);
+        driver.mecanumDriveForward(1); //distance
+        sleep(6000);
+        driver.mecanumDriveForward(0);
+        driver.mecanumDriveBackward(3, SPEED);
+        getMarker().setPosition(1);
+        new Thread(() -> {
+            sleep(2000);
+            getMarker().setPosition(0.35);
+        }).start();
+        driver.mecanumDriveBackward(18, SPEED);
     }
-
 }

@@ -30,22 +30,10 @@
 package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
-import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
 import org.firstinspires.ftc.teamcode.util.Position;
-
-import java.util.List;
 
 /**
  * This 2018-2019 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -57,13 +45,13 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Marker Sample", group = "auto")
+@Autonomous(name = "Crater Sample", group = "auto")
 //@Disabled
-public class MarkerSample extends AutonomousBaseOpMode {
-    RobotDriver driver = RobotDriver.getDriver();
-    public Position position = null;
+public class DepotOpMode extends AutonomousBaseOpMode {
+    private Position position = null;
     private final int CHECKS = 5;
-
+    private final double SPEED = 0.80;
+    private final double pullDownHeight = 5.1;
     @Override
     protected void prerun() {
         FindMineralRunnable.setRecordData(true);
@@ -71,79 +59,61 @@ public class MarkerSample extends AutonomousBaseOpMode {
     }
 
     @Override
-    public void run() {
+    protected void run() {
         int i = 0;
         position = FindMineralRunnable.getCurrentPosition();
-        while (true) {
-            if (i >= CHECKS) {
+        while(true){
+            if(i >= CHECKS) {
+                FindMineralRunnable.forceStop();
                 telemetry.addLine(String.format("Passed accuracy check: Position %s", position));
                 break;
             }
-            if (position == FindMineralRunnable.getCurrentPosition()) i++;
+            if(position == FindMineralRunnable.getCurrentPosition()) i++;
             else {
                 run();
                 return; // make sure it only runs this once
             }
-            if (getRuntime() > 5) { //if 5 seconds elapsed without it being accurate, just set it
+            if(getRuntime() > 5){ //if 5 seconds elapsed without it being accurate, just set it
                 position = FindMineralRunnable.getCurrentPosition();
-                position = (position == Position.NULL) ? position : Position.RIGHT;
                 telemetry.addLine("Runtime too long, going over");
                 break;
             }
         }
+        driver.extendPullDownBar(pullDownHeight, 0.77d);
+        driver.gyroTurn(30, 0.5, 4.5);
+        driver.mecanumDriveForward(3, SPEED);
+        driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
+        driver.mecanumDriveForward(3, SPEED);
+
+        position = (position != null) ? position : Position.RIGHT;
         FindMineralRunnable.setRecordData(false);
-        telemetry.update();
-        switch (position) {
-            case RIGHT:
-                driver.mecanumDriveForward(-25, 0.5);
-                driver.mecanumDriveLeft(40, 1);
-                driver.mecanumDriveForward(-50, 0.5);
-                driver.turnLeft(0.5);
-                driver.mecanumDriveForward(-40, 0.5);
-                //Team Marker
-                getMarker().setPosition(0);
-                sleep(2500);
-                getMarker().setPosition(0.35);
+        FindMineralRunnable.forceStop();
 
-                driver.turnLeft(0.5);
-                driver.turnLeft(0.5);
-                driver.turnLeft(0.5);
-                driver.mecanumDriveForward(100, 0.5);
-                driver.mecanumDriveLeft(150, 1);
-                break;
+        switch(position){
             case LEFT:
-                driver.mecanumDriveForward(-25, 0.5);
-                driver.mecanumDriveRight(60, 1);
-                driver.mecanumDriveForward(-50, 0.5);
-                driver.turnLeft(0.5);
-                driver.mecanumDriveForward(-40, 0.5);
-                //Team Marker
-                getMarker().setPosition(0);
-                sleep(2500);
-                getMarker().setPosition(0.35);
-
-                driver.turnLeft(0.5);
-                driver.turnLeft(0.5);
-                driver.turnLeft(0.5);
-                driver.mecanumDriveForward(100, 0.5);
-                driver.mecanumDriveLeft(150, 1);
-                break;
+                driver.mecanumDriveLeft(12, SPEED);
+                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
+                driver.mecanumDriveForward(9, SPEED);
+            case RIGHT:
+                driver.mecanumDriveRight(12, SPEED);
+                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
+                driver.mecanumDriveForward(9, SPEED);
             case CENTER:
-                driver.mecanumDriveForward(-25, 0.5);
-                driver.mecanumDriveForward(-50, 0.5);
-                driver.mecanumDriveForward(-40, 0.5);
-                //Team Marker
-                getMarker().setPosition(0);
-                sleep(2500);
-                getMarker().setPosition(0.35);
-
-                driver.turnLeft(0.5);
-                driver.turnLeft(0.5);
-                driver.turnLeft(0.5);
-                driver.mecanumDriveForward(100, 0.5);
-                driver.mecanumDriveLeft(150, 1);
-                break;
+                driver.mecanumDriveForward(9, SPEED);
+            case NULL:
+                driver.mecanumDriveForward(9, SPEED);
         }
-        driver.mecanumDriveForward(-200, 0.5);
+        driver.mecanumDriveForward(6, SPEED);
+        driver.mecanumDriveLeft(11, SPEED); //distance
+        driver.mecanumDriveForward(1); //distance
+        sleep(2000);
+        driver.mecanumDriveBackward(3, SPEED);
+        getMarker().setPosition(1);
+        new Thread(() -> {
+            sleep(2000);
+            getMarker().setPosition(0.35);
+        }).start();
+
+        driver.mecanumDriveBackward(18, SPEED);
     }
 }

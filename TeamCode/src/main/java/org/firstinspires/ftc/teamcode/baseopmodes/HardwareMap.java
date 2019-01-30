@@ -1,22 +1,23 @@
 package org.firstinspires.ftc.teamcode.baseopmodes;
 
-import android.graphics.Camera;
-
 
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.sun.tools.javac.comp.DeferredAttr;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.VARIABLES;
+
+import java.io.File;
 
 /**
  * Ultro
@@ -61,11 +62,18 @@ public final class HardwareMap {
     private final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
     private static final String VUFORIA_KEY = VARIABLES.VUFORIA_KEY;
-    private VuforiaLocalizer vuforia;
+    private VuforiaLocalizer phoneVuforia;
+    private VuforiaLocalizer cameraVuforia;
     private TFObjectDetector tfod;
 
     private int cameraMonitorViewId;
     private WebcamName webcamName;
+    private final File captureDirectory = AppUtil.ROBOT_DATA_DIR;
+
+
+    private VuforiaTrackable relicTemplate;
+
+    OpenGLMatrix lastLocation = null;
 
     public void hardwareInit(Telemetry telemetry){
         cameraViewId = hardwareMap.appContext.getResources().getIdentifier("9ED9A76F", "id", hardwareMap.appContext.getPackageName());
@@ -77,7 +85,7 @@ public final class HardwareMap {
         imuInit(telemetry);
         //</editor-fold>
         //<editor-fold desc="Tensor Flow configuration">
-        initCamera(telemetry);
+        initPhoneCamera(telemetry);
         //</editor-fold>
     }
 
@@ -175,50 +183,42 @@ public final class HardwareMap {
         }
     }
 
-//    public void initCamera(Telemetry telemetry){
-//        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-//        initVuforia();
-//        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-//            initTfod();
-//        } else {
-//            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-//        }
-//    }
-//    private void initVuforia() {
-//        /*
-//         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-//         */
-//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-//        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-//        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-//        parameters.cameraName = webcamName;
-//
-//        //  Instantiate the Vuforia engine
-//        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-//        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
-//    }
-
     public void initCamera(Telemetry telemetry){
-        //webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        initVuforia();
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = webcamName;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        //parameters.cameraName = webcamName;
+        cameraVuforia = ClassFactory.getInstance().createVuforia(parameters);
+        //  Instantiate the Vuforia engine
+        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
+        VuforiaTrackables relicTrackables = this.cameraVuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
+        relicTemplate.setName("relicVuMarkTemplate");
     }
-    private void initVuforia() {
+
+    public void initPhoneCamera(Telemetry telemetry){
+        initPhoneVuforia();
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) initTfod();
+        else telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+    }
+
+
+    private void initPhoneVuforia() {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        //parameters.cameraName = webcamName;
 
         //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+        phoneVuforia = ClassFactory.getInstance().createVuforia(parameters);
         // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
     }
 
@@ -226,7 +226,7 @@ public final class HardwareMap {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, phoneVuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
 
@@ -271,8 +271,8 @@ public final class HardwareMap {
     public final int getCameraViewId(){
         return cameraViewId;
     }
-    public final VuforiaLocalizer getVuforia() {
-        return vuforia;
+    public final VuforiaLocalizer getPhoneVuforia() {
+        return phoneVuforia;
     }
     public final TFObjectDetector getTfod() {
         return tfod;
@@ -282,6 +282,10 @@ public final class HardwareMap {
 //    }
     public final WebcamName getWebcamName() {
         return webcamName;
+    }
+
+    public VuforiaTrackable getRelicTemplate() {
+        return relicTemplate;
     }
 
     public final String getTfodModelAsset() {
