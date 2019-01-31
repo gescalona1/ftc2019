@@ -38,8 +38,8 @@ public class RobotDriver {
     private final double DRIVE_COUNTS_PER_MOTOR_HEX  =    1120;
     private final double DRIVE_DRIVE_GEAR_REDUCTION  =   15 / 24;
     private final double DRIVE_WHEEL_DIAMETER_INCHES =   4;
-    private final double DRIVE_COUNTS_PER_INCH       =   DRIVE_COUNTS_PER_MOTOR_HEX * (DRIVE_DRIVE_GEAR_REDUCTION/DRIVE_WHEEL_DIAMETER_INCHES)
-            / (Math.PI*4);
+    private final double DRIVE_COUNTS_PER_INCH       =   (DRIVE_COUNTS_PER_MOTOR_HEX * DRIVE_DRIVE_GEAR_REDUCTION)/(DRIVE_WHEEL_DIAMETER_INCHES
+            / (Math.PI));
 
     /**
      * Updated mecanum drive function this year (math is ? ?? ? )
