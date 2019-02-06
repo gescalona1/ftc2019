@@ -22,7 +22,7 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     protected RobotDriver driver = RobotDriver.getDriver();
     protected HardwareMap map;
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode()  {
         telemetry.addData("Hardware Initialization:", "Not done");
         telemetry.update();
 

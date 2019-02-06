@@ -28,10 +28,17 @@ import java.io.File;
  */
 
 public final class HardwareMap {
+
+
     private com.qualcomm.robotcore.hardware.HardwareMap hardwareMap;
     public HardwareMap(com.qualcomm.robotcore.hardware.HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
     }
+
+    public com.qualcomm.robotcore.hardware.HardwareMap getHardwareMap() {
+        return hardwareMap;
+    }
+
     private int cameraViewId;
 
     private BNO055IMU imu;
@@ -77,13 +84,14 @@ public final class HardwareMap {
 
     public void hardwareInit(Telemetry telemetry){
         cameraViewId = hardwareMap.appContext.getResources().getIdentifier("9ED9A76F", "id", hardwareMap.appContext.getPackageName());
+        //<editor-fold desc="ImuConfiguration">
+        imuInit(telemetry);
+        //</editor-fold>
         //<editor-fold desc="DcMotorSetup">
         motorInit();
         //</editor-fold>
         servoInit();
-        //<editor-fold desc="ImuConfiguration">
-        imuInit(telemetry);
-        //</editor-fold>
+
         //<editor-fold desc="Tensor Flow configuration">
         initPhoneCamera(telemetry);
         //</editor-fold>
@@ -315,18 +323,12 @@ public final class HardwareMap {
     }
 
     public boolean playRick(){
-        if (rickFound) {
-            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, rickSoundID);
-            return true;
-        }
-        return false;
+        SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, rickSoundID);
+        return rickFound;
     }
     public boolean playUSSR(){
-        if (ussrFound) {
-            SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, rickSoundID);
-            return true;
-        }
-        return false;
+        SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, ussrSoundID);
+        return ussrFound;
     }
 
     public void stopPlayingAllSounds(){

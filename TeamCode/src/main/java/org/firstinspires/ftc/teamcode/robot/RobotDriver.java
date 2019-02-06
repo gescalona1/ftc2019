@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -459,13 +460,16 @@ public class RobotDriver {
             Thread t = new Thread(new FindMineralRunnable());
 
             this.telemetry.addLine("Find Mineral starting thread");
+            this.telemetry.update();
             if (!FindMineralRunnable.isAlreadyRunning()) {
                 t.start();
                 this.telemetry.addLine("Find Mineral is now running");
             }
 
+
         }
         this.telemetry.addLine("Set hardware map was successful");
+        telemetry.update();
     }
 
     public UsesHardware getHardwareMap() {

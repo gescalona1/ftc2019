@@ -45,7 +45,7 @@ public final class FindMineralRunnable implements Runnable {
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null) {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
-                        if (updatedRecognitions.size() == 3) {
+                        if (updatedRecognitions.size() == 2) {
                             int goldMineralX = -1;
                             int silverMineral1X = -1;
                             int silverMineral2X = -1;
@@ -58,15 +58,15 @@ public final class FindMineralRunnable implements Runnable {
                                     silverMineral2X = (int) recognition.getLeft();
                                 }
                             }
-                            if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-                                if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                    position = Position.LEFT;
-                                } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                    position = Position.RIGHT;
-                                } else {
+                            if(goldMineralX == -1 && silverMineral1X !=  -1 && silverMineral2X != -1){
+                                position = Position.LEFT;
+                            }else if(goldMineralX != -1){
+                                if(goldMineralX < silverMineral1X || goldMineralX < silverMineral2X){
                                     position = Position.CENTER;
+                                }else if(goldMineralX > silverMineral1X || goldMineralX > silverMineral2X){
+                                    position = Position.RIGHT;
                                 }
-                            } else position = Position.NULL;
+                            }else position = Position.NULL;
                         } else position = Position.NULL;
                         if (recordData) {
                             telemetry.addData("Gold Mineral Position", position.toString());

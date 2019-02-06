@@ -45,7 +45,7 @@ import org.firstinspires.ftc.teamcode.util.Position;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Crater Sample", group = "auto")
+@Autonomous(name = "Depot Sample", group = "auto")
 //@Disabled
 public class DepotOpMode extends AutonomousBaseOpMode {
     private Position position = null;
