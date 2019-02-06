@@ -45,17 +45,23 @@ public final class FindMineralRunnable implements Runnable {
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null) {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
+                        int goldMineralX = -1;
+                        float goldAccuracy = -1;
+                        int silverMineral1X = -1;
+                        float silverMineral1Accuracy = -1;
+                        int silverMineral2X = -1;
+                        float silverMineral2Accuracy = -1;
                         if (updatedRecognitions.size() == 2) {
-                            int goldMineralX = -1;
-                            int silverMineral1X = -1;
-                            int silverMineral2X = -1;
                             for (Recognition recognition : updatedRecognitions) {
                                 if (recognition.getLabel().equals(((UsesHardware) opMode).getLabelGoldMineral())) {
                                     goldMineralX = (int) recognition.getLeft();
+                                    goldAccuracy = recognition.getConfidence();
                                 } else if (silverMineral1X == -1) {
                                     silverMineral1X = (int) recognition.getLeft();
+                                    silverMineral1Accuracy = recognition.getConfidence();
                                 } else {
                                     silverMineral2X = (int) recognition.getLeft();
+                                    silverMineral2Accuracy = recognition.getConfidence();
                                 }
                             }
                             if(goldMineralX == -1 && silverMineral1X !=  -1 && silverMineral2X != -1){
@@ -70,6 +76,9 @@ public final class FindMineralRunnable implements Runnable {
                         } else position = Position.NULL;
                         if (recordData) {
                             telemetry.addData("Gold Mineral Position", position.toString());
+                            telemetry.addData("Gold Mineral Accuracy", goldAccuracy);
+                            telemetry.addData("Silver1 Mineral Accuracy", silverMineral1Accuracy);
+                            telemetry.addData("Silver2 Mineral Accuracy", silverMineral2Accuracy);
                             telemetry.update();
                         }
                     }
