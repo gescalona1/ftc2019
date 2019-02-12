@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -57,8 +58,9 @@ import java.util.List;
 //@Disabled
 public class CraterOpMode extends AutonomousBaseOpMode {
     private Position position = null;
+    private AutoHelper autoHelper = new AutoHelper(this);
     private final int CHECKS = 5;
-    private final double SPEED = 0.80;
+    private final double SPEED = 0.40;
     private final double pullDownHeight = 5.1;
     @Override
     protected void prerun() {
@@ -71,6 +73,7 @@ public class CraterOpMode extends AutonomousBaseOpMode {
         int i = 0;
         position = FindMineralRunnable.getCurrentPosition();
         while(true){
+            if(isStopRequested()) break;
             if(i >= CHECKS) {
                 FindMineralRunnable.forceStop();
                 telemetry.addLine(String.format("Passed accuracy check: Position %s", position));
@@ -87,46 +90,39 @@ public class CraterOpMode extends AutonomousBaseOpMode {
                 break;
             }
         }
-        driver.extendPullDownBar(pullDownHeight, 0.77d);
-        driver.gyroTurn(30, 0.5, 4.5);
-        driver.mecanumDriveForward(3, SPEED);
-        driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
-        driver.mecanumDriveForward(3, SPEED);
+        autoHelper.land();
 
         position = (position != null) ? position : Position.RIGHT;
         FindMineralRunnable.setRecordData(false);
         FindMineralRunnable.forceStop();
 
-        switch(position){
-            case LEFT:
-                driver.mecanumDriveLeft(12, SPEED);
-                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
-                driver.mecanumDriveForward(9, SPEED);
-            case RIGHT:
-                driver.mecanumDriveRight(12, SPEED);
-                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
-                driver.mecanumDriveForward(9, SPEED);
-            case CENTER:
-                driver.mecanumDriveForward(9, SPEED);
-            case NULL:
-                driver.mecanumDriveForward(9, SPEED);
-        }
+        autoHelper.knock(position);
 
-        driver.mecanumDriveBackward(-12, SPEED);
-        driver.gyroTurn(180, 0.5,4.5);
-        driver.mecanumDriveRight(14, SPEED); //distance
-        driver.mecanumDriveRight(1);
-        sleep(1500);
-        driver.mecanumDriveLeft(1, SPEED);
+        driver.mecanumDriveBackward(7, SPEED);
+        driver.gyroTurn(180, 0.5);
+        driver.mecanumDriveRight(1); //distance
+        while(!(getFrontDSensor().getDistance(DistanceUnit.INCH) <= 2.0) && opModeIsActive()){
+            if(isStopRequested()) break;
+            driver.mecanumDriveRight(0);
+        }
+        driver.mecanumDriveRight(8, 1);
+        sleep(250);
+        driver.mecanumDriveLeft(1);
+        sleep(1000);
+        driver.mecanumDriveLeft(0);
+
         driver.mecanumDriveForward(1); //distance
+        while(!(getFrontDSensor().getDistance(DistanceUnit.INCH) <= 20.0) && opModeIsActive()){
+            if(isStopRequested()) break;
+            driver.mecanumDriveForward(0);
+        }
+        /*
         sleep(6000);
         driver.mecanumDriveForward(0);
         driver.mecanumDriveBackward(3, SPEED);
+        */
         getMarker().setPosition(1);
-        new Thread(() -> {
-            sleep(2000);
-            getMarker().setPosition(0.35);
-        }).start();
-        driver.mecanumDriveBackward(18, SPEED);
+        sleep(2000);
+        driver.mecanumDriveBackward(70, SPEED);
     }
 }

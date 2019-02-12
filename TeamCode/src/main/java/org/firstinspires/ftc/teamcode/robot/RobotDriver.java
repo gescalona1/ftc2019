@@ -36,11 +36,13 @@ public class RobotDriver {
     private final double  BAR_COUNTS_PER_INCH       =   BAR_COUNTS_PER_MOTOR_REV * (BAR_DRIVE_GEAR_REDUCTION/BAR_WHEEL_DIAMETER_INCHES)
             / (Math.PI*4);
 
-    private final double DRIVE_COUNTS_PER_MOTOR_HEX  =    1120;
-    private final double DRIVE_DRIVE_GEAR_REDUCTION  =   15 / 24;
-    private final double DRIVE_WHEEL_DIAMETER_INCHES =   4;
-    private final double DRIVE_COUNTS_PER_INCH       =   (DRIVE_COUNTS_PER_MOTOR_HEX * DRIVE_DRIVE_GEAR_REDUCTION)/(DRIVE_WHEEL_DIAMETER_INCHES
-            / (Math.PI));
+    private final double DRIVE_COUNTS_PER_MOTOR_HEX  =    1120d;
+    private final double DRIVE_DRIVE_GEAR_REDUCTION  =   15d / 24d;
+    private final double DRIVE_WHEEL_DIAMETER_INCHES =   4d;
+    private final double DRIVE_COUNTS_PER_INCH       =
+            (DRIVE_COUNTS_PER_MOTOR_HEX * DRIVE_DRIVE_GEAR_REDUCTION)
+                    /
+                    (DRIVE_WHEEL_DIAMETER_INCHES * Math.PI);
 
     /**
      * Updated mecanum drive function this year (math is ? ?? ? )
@@ -94,18 +96,21 @@ public class RobotDriver {
         int newrightFrontTarget = rightFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
         int newleftFrontTarget = leftFront.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
         int newrightBackTarget = rightBack.getCurrentPosition() + (int)(inches * DRIVE_COUNTS_PER_INCH);
-        //<editor-fold desc="Setting to RUN_TO_POSITION">
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //</editor-fold>
         //<editor-fold desc="Setting Target Positions">
         leftBack.setTargetPosition(newleftBackTarget);
         leftFront.setTargetPosition(newleftFrontTarget);
         rightBack.setTargetPosition(newrightBackTarget);
         rightFront.setTargetPosition(newrightFrontTarget);
         //</editor-fold>
+
+        //<editor-fold desc="Setting to RUN_TO_POSITION">
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //</editor-fold>
+
+//        if(inches < 0) speed = -speed;
         //<editor-fold desc="Setting Power">
         leftBack.setPower(speed);
         rightFront.setPower(speed);
@@ -115,7 +120,13 @@ public class RobotDriver {
         while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
             if(opmode instanceof OpMode){
                 ((OpMode) opmode).telemetry.addData("Speed", speed);
-                ((OpMode) opmode).telemetry.addData("Currently going:", "right");
+                ((OpMode) opmode).telemetry.addData("Currently going:", "forward or backward");
+
+                ((OpMode) opmode).telemetry.addData("Expected Position Left:", leftBack.getTargetPosition());
+                ((OpMode) opmode).telemetry.addData("Expected Position Left:", rightBack.getTargetPosition());
+
+                ((OpMode) opmode).telemetry.addData("Current Position Left:", leftBack.getCurrentPosition());
+                ((OpMode) opmode).telemetry.addData("Current Position Right:", rightBack.getCurrentPosition());
                 ((OpMode) opmode).telemetry.update();
             }
         }
@@ -126,13 +137,17 @@ public class RobotDriver {
         rightBack.setPower(0);
         //</editor-fold>
         //<editor-fold desc="Setting to RUN_WITHOUT_ENCODER">
-        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //</editor-fold>
     }
-    public void mecanumDriveForward(double speed){
+    public void mecanumDriveBackward(int inches, double speed){
+        mecanumDriveForward(-inches, speed);
+    }
+
+    public void mecanumDriveBackward(double speed){
         //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
         DcMotor leftBack = opmode.getLeftBackDrive();
         DcMotor leftFront = opmode.getLeftFrontDrive();
@@ -144,12 +159,8 @@ public class RobotDriver {
         leftFront.setPower(speed);
         rightBack.setPower(speed);
     }
-
-    public void mecanumDriveBackward(int inches, double speed){
-        mecanumDriveForward(-inches, speed);
-    }
-    public void mecanumDriveBackward(double speed){
-        mecanumDriveForward(-speed);
+    public void mecanumDriveForward(double speed){
+        mecanumDriveBackward(-speed);
     }
 
 
@@ -199,10 +210,10 @@ public class RobotDriver {
         rightBack.setPower(0);
         //</editor-fold>
 
-        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
     public void mecanumDriveRight(int inches, double speed){
@@ -292,7 +303,7 @@ public class RobotDriver {
             }
             // initiates powers
             double leftfrontpower = 0, leftbackpower = 0, rightfrontpower = 0, rightbackpower = 0;
-            if (angle > 0) {
+            if (angle < 0) {
                 /*
                     If the angle goes to the left,
                     set the positive power to the right side and set the negative power to left side.
@@ -302,7 +313,7 @@ public class RobotDriver {
                 leftbackpower = -power;
                 rightfrontpower = power;
                 rightbackpower = power;
-            } else if (angle < 0) {
+            } else if (angle > 0) {
                 /*
                     If the angle goes to the right,
                     set the positive power to the left side and set the negative power to right side.

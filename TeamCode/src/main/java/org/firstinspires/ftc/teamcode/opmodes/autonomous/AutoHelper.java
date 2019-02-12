@@ -1,67 +1,73 @@
-package org.firstinspires.ftc.teamcode.baseopmodes;
+package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.UsesHardware;
+import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
+import org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
+import org.firstinspires.ftc.teamcode.util.Position;
 
 /**
- * Ultro
- * DriverBaseOpMode.java
- * Purpose: Base OP mode for all driver classes
- *
- * @version 1.0 10/11/2018
+ * Created by gescalona on 2/8/19.
  */
 
-public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
-    protected ElapsedTime runtime = new ElapsedTime();
-    protected org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap map;
+public class AutoHelper implements UsesHardware {
+    private AutonomousBaseOpMode baseOpMode;
+    private RobotDriver driver;
+    private HardwareMap map;
+    private Telemetry telemetry;
+    private final double SPEED = 0.9d;
+    private final double pullDownHeight = 5.1;
+    public AutoHelper(AutonomousBaseOpMode baseOpMode) {
+        this.baseOpMode = baseOpMode;
+        this.driver = RobotDriver.getDriver();
+        this.map = baseOpMode.getMap();
+    }
+
+    public void land(){
+        driver.extendPullDownBar(pullDownHeight - 0.1, 0.77d);
+        driver.gyroTurn(-20, 0.6, 4.5);
+
+        driver.mecanumDriveForward(3, SPEED);
+        driver.gyroTurn(20, 0.6, 4.5);
+        driver.mecanumDriveRight(2, SPEED);
+        driver.mecanumDriveForward(12, SPEED);
+    }
+
+    public void knock(Position position){
+        switch(position){
+            case LEFT:
+                driver.mecanumDriveLeft(24, SPEED);
+                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
+                driver.mecanumDriveForward(9, SPEED);
+                break;
+            case RIGHT:
+                driver.mecanumDriveRight(22, SPEED);
+                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
+                driver.mecanumDriveForward(9, SPEED);
+                break;
+            case CENTER:
+                driver.mecanumDriveForward(9, SPEED);
+                break;
+            case NULL:
+                driver.mecanumDriveForward(9, SPEED);
+                break;
+        }
+    }
+
 
     @Override
-    public void init() {
-        hardwareInit();
-        RobotDriver.getDriver().setHardwareMap(this);
-        inita();
-        initb();
+    public void hardwareInit(){ //don't do this
+
     }
-
-    @Override
-    public void stop(){
-        RobotDriver.getDriver().setHardwareMap(null);
-        map = null;
-        stopb();
-    }
-    private void inita(){
-        this.runtime.reset();
-        telemetry.addData("Status", "Initializing");
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-
-        // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-    }
-
-    public abstract void initb();
-    public abstract void stopb();
-    @Override
-    public void hardwareInit(){
-        map = new org.firstinspires.ftc.teamcode.baseopmodes.HardwareMap(hardwareMap);
-        map.driverHardwareInit(telemetry);
-    }
-
     @Override
     public boolean playRick(){
         return map.playRick();
@@ -70,7 +76,6 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     public boolean playUSSR(){
         return map.playUSSR();
     }
-
     @Override
     public final DcMotor getLeftFrontDrive() {
         return map.getLeftFrontDrive();
@@ -91,6 +96,17 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
         return map.getRightBackDrive();
     }
 
+
+    @Override
+    public DcMotor getRightpuldaun() {
+        return map.getRightpuldaun();
+    }
+
+    @Override
+    public DcMotor getLeftpuldaun() {
+        return map.getLeftpuldaun();
+    }
+
     @Override
     public Servo getIntake() {
         return map.getIntake();
@@ -103,13 +119,6 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     public DcMotor getRotate() {
         return map.getRotate();
     }
-    public final DcMotor getRightpuldaun() {
-        return map.getRightpuldaun();
-    }
-    @Override
-    public final DcMotor getLeftpuldaun() {
-        return map.getLeftpuldaun();
-    }
 
 
     @Override
@@ -121,7 +130,6 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     public final Servo getMarker() {
         return map.getMarker();
     }
-
     @Override
     public final BNO055IMU getImu() {
         return map.getImu();
@@ -142,6 +150,11 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
         return map.getTfod();
     }
 
+    @Override
+    public VuforiaTrackable getRelicTemplate() {
+        return map.getRelicTemplate();
+    }
+
     public final String getTfodModelAsset() {
         return map.getTfodModelAsset();
     }
@@ -150,11 +163,6 @@ public abstract class DriverBaseOpMode extends OpMode implements UsesHardware {
     }
     public final String getLabelSilverMineral() {
         return map.getLabelSilverMineral();
-    }
-
-    @Override
-    public VuforiaTrackable getRelicTemplate() {
-        return map.getRelicTemplate();
     }
 
     public Rev2mDistanceSensor getFrontDSensor() {

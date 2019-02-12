@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -48,4 +49,8 @@ public interface UsesHardware {
 
     boolean playRick();
     boolean playUSSR();
+
+    Rev2mDistanceSensor getFrontDSensor();
+    Rev2mDistanceSensor getLeftDSensor();
+    Rev2mDistanceSensor getRightDSensor();
 }

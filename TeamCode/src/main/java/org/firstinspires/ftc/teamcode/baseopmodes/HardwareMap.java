@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.baseopmodes;
 
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -18,6 +20,9 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.VARIABLES;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Ultro
@@ -58,6 +63,11 @@ public final class HardwareMap {
     private Servo intake = null;
     private Servo buck = null;
     private Servo marker = null;
+
+    private Rev2mDistanceSensor frontDSensor;
+    private Rev2mDistanceSensor leftDSensor;
+    private Rev2mDistanceSensor rightDSensor;
+
     int rickSoundID;
     boolean rickFound;
     int ussrSoundID;
@@ -85,8 +95,9 @@ public final class HardwareMap {
     public void hardwareInit(Telemetry telemetry){
         cameraViewId = hardwareMap.appContext.getResources().getIdentifier("9ED9A76F", "id", hardwareMap.appContext.getPackageName());
         //<editor-fold desc="ImuConfiguration">
+
         imuInit(telemetry);
-        //</editor-fold>
+        dsensorInit();
         //<editor-fold desc="DcMotorSetup">
         motorInit();
         //</editor-fold>
@@ -95,6 +106,8 @@ public final class HardwareMap {
         //<editor-fold desc="Tensor Flow configuration">
         initPhoneCamera(telemetry);
         //</editor-fold>
+        //</editor-fold>
+
     }
 
 
@@ -138,16 +151,20 @@ public final class HardwareMap {
         leftpuldaun.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightpuldaun.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftpuldaun.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -157,6 +174,21 @@ public final class HardwareMap {
         extend.setDirection(DcMotor.Direction.REVERSE);
         rightpuldaun.setDirection(DcMotor.Direction.FORWARD);
         leftpuldaun.setDirection(DcMotor.Direction.REVERSE);
+
+    }
+
+    public void dsensorInit(){
+        frontDSensor = (Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "frontD");
+        leftDSensor = (Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "leftD");
+        rightDSensor = (Rev2mDistanceSensor) hardwareMap.get(DistanceSensor.class, "rightD");
+
+        List<Rev2mDistanceSensor> hello = new ArrayList<>();
+        hello.add(frontDSensor);
+        hello.add(leftDSensor);
+        hello.add(rightDSensor);
+        for(Rev2mDistanceSensor sensor : hello){
+            sensor.initialize();
+        }
 
     }
 
@@ -329,6 +361,18 @@ public final class HardwareMap {
     public boolean playUSSR(){
         SoundPlayer.getInstance().startPlaying(hardwareMap.appContext, ussrSoundID);
         return ussrFound;
+    }
+
+    public Rev2mDistanceSensor getFrontDSensor() {
+        return frontDSensor;
+    }
+
+    public Rev2mDistanceSensor getLeftDSensor() {
+        return leftDSensor;
+    }
+
+    public Rev2mDistanceSensor getRightDSensor() {
+        return rightDSensor;
     }
 
     public void stopPlayingAllSounds(){

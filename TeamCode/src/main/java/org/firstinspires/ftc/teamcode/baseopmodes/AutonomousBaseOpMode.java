@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.baseopmodes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -22,7 +23,7 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     protected RobotDriver driver = RobotDriver.getDriver();
     protected HardwareMap map;
     @Override
-    public void runOpMode()  {
+    public void runOpMode() throws InterruptedException {
         telemetry.addData("Hardware Initialization:", "Not done");
         telemetry.update();
 
@@ -30,6 +31,7 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
         RobotDriver.getDriver().setHardwareMap(this);
         RobotDriver.getDriver().resetAngle();
         telemetry.addData("Hardware Initialization:", "Finished");
+        telemetry.addData("Gyro init", getImu().isGyroCalibrated());
         telemetry.update();
         prerun();
         waitForStart();
@@ -145,5 +147,21 @@ public abstract class AutonomousBaseOpMode extends LinearOpMode implements UsesH
     }
     public final String getLabelSilverMineral() {
         return map.getLabelSilverMineral();
+    }
+
+    public Rev2mDistanceSensor getFrontDSensor() {
+        return map.getFrontDSensor();
+    }
+
+    public Rev2mDistanceSensor getLeftDSensor() {
+        return map.getLeftDSensor();
+    }
+
+    public Rev2mDistanceSensor getRightDSensor() {
+        return map.getRightDSensor();
+    }
+
+    public HardwareMap getMap() {
+        return map;
     }
 }

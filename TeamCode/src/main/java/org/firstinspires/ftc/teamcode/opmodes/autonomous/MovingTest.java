@@ -2,10 +2,13 @@ package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.baseopmodes.AutonomousBaseOpMode;
 import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 import org.firstinspires.ftc.teamcode.util.FindMineralRunnable;
 import org.firstinspires.ftc.teamcode.util.Position;
+
+import java.util.Locale;
 
 /**
  * Ultro
@@ -18,7 +21,7 @@ import org.firstinspires.ftc.teamcode.util.Position;
 public class MovingTest extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
-    private final double SPEED = 0.75d;
+    private final double SPEED = 1d;
     /*
     Before waitforStart()
      */
@@ -26,7 +29,13 @@ public class MovingTest extends AutonomousBaseOpMode {
     protected void prerun() {
         telemetry.addLine("Finding Orientation of the gold mineral");
         telemetry.update();
-
+        while(!opModeIsActive()){
+            if(isStopRequested()) break;
+            telemetry.addData("range", String.format(Locale.ENGLISH, "%.01f in", getFrontDSensor().getDistance(DistanceUnit.INCH)));
+            telemetry.addData("range", String.format(Locale.ENGLISH, "%.01f in", getLeftDSensor().getDistance(DistanceUnit.INCH)));
+            telemetry.addData("range", String.format(Locale.ENGLISH,  "%.01f in", getRightDSensor().getDistance(DistanceUnit.INCH)));
+            telemetry.update();
+        }
         resetStartTime();
     }
     /*
@@ -34,9 +43,8 @@ public class MovingTest extends AutonomousBaseOpMode {
      */
     @Override
     protected void run() {
-        driver.mecanumDriveForward(10, SPEED);
         driver.mecanumDriveBackward(10 , SPEED);
-
+        driver.mecanumDriveForward(10, SPEED);
         driver.mecanumDriveRight(10, SPEED);
         driver.mecanumDriveLeft(10, SPEED);
 
