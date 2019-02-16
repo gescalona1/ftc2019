@@ -60,7 +60,7 @@ public class CraterOpMode extends AutonomousBaseOpMode {
     private Position position = null;
     private AutoHelper autoHelper = new AutoHelper(this);
     private final int CHECKS = 5;
-    private final double SPEED = 0.40;
+    private final double SPEED = 0.8;
     private final double pullDownHeight = 5.1;
     @Override
     protected void prerun() {
@@ -94,35 +94,44 @@ public class CraterOpMode extends AutonomousBaseOpMode {
 
         position = (position != null) ? position : Position.RIGHT;
         FindMineralRunnable.setRecordData(false);
-        FindMineralRunnable.forceStop();
 
         autoHelper.knock(position);
 
-        driver.mecanumDriveBackward(7, SPEED);
-        driver.gyroTurn(180, 0.5);
-        driver.mecanumDriveRight(1); //distance
-        while(!(getFrontDSensor().getDistance(DistanceUnit.INCH) <= 2.0) && opModeIsActive()){
-            if(isStopRequested()) break;
-            driver.mecanumDriveRight(0);
+        driver.mecanumDriveBackward(8, SPEED);
+        //driver.gyroTurn(driver.getAngle(), 0.3);
+        driver.gyroTurn(-92, 0.3, 3.2);
+        driver.mecanumDriveRight(3, 1);
+        switch(position){
+            case LEFT:
+                break;
+            case CENTER:
+                driver.mecanumDriveForward(12, SPEED);
+                break;
+            case RIGHT:
+                driver.mecanumDriveForward(28, SPEED);
+                break;
         }
-        driver.mecanumDriveRight(8, 1);
-        sleep(250);
-        driver.mecanumDriveLeft(1);
-        sleep(1000);
-        driver.mecanumDriveLeft(0);
-
-        driver.mecanumDriveForward(1); //distance
+        driver.mecanumDriveRight(3, 1);
+        driver.mecanumDriveForward(15, SPEED);
+        driver.gyroTurn(-30, 0.45, 3.2);
+        driver.mecanumDriveRight(SPEED);
+        while(getRightDSensor().getDistance(DistanceUnit.INCH) > 2){}
+        driver.mecanumDriveRight(10, SPEED);
+        driver.mecanumDriveForward(SPEED); //distance
+        getLeftBackDrive().setPower(1);
         while(!(getFrontDSensor().getDistance(DistanceUnit.INCH) <= 20.0) && opModeIsActive()){
-            if(isStopRequested()) break;
-            driver.mecanumDriveForward(0);
+            if(isStopRequested() || (getFrontDSensor().getDistance(DistanceUnit.INCH) >= 10.0 && getFrontDSensor().getDistance(DistanceUnit.INCH) <= 20.0)) break;
         }
+        driver.mecanumDriveForward(0);
         /*
         sleep(6000);
         driver.mecanumDriveForward(0);
         driver.mecanumDriveBackward(3, SPEED);
         */
         getMarker().setPosition(1);
-        sleep(2000);
-        driver.mecanumDriveBackward(70, SPEED);
+        driver.mecanumDriveRight(10, 1);
+        driver.mecanumDriveBackward(35, 0.9);
+        driver.mecanumDriveRight(18, 0.5);
+        driver.mecanumDriveBackward(25, 0.24);
     }
 }

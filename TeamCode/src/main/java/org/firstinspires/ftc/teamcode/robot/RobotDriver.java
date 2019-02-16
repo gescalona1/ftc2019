@@ -51,10 +51,10 @@ public class RobotDriver {
      * @param right_stick_x gamepadrightX
      */
     public void mecanumDrive(double left_stick_y, double left_stick_x, double right_stick_x){
-        double LB = Range.clip(-left_stick_y - left_stick_x - right_stick_x, -1, 1);
-        double LF = Range.clip(-left_stick_y + left_stick_x - right_stick_x, -1, 1);
-        double RB = Range.clip(-left_stick_y + left_stick_x + right_stick_x, -1, 1);
-        double RF = Range.clip(-left_stick_y - left_stick_x + right_stick_x, -1, 1);
+        double LB = Range.clip(left_stick_y + left_stick_x + right_stick_x, -1, 1);
+        double LF = Range.clip(left_stick_y - left_stick_x + right_stick_x, -1, 1);
+        double RB = Range.clip(left_stick_y - left_stick_x - right_stick_x, -1, 1);
+        double RF = Range.clip(left_stick_y + left_stick_x - right_stick_x, -1, 1);
         opmode.getLeftBackDrive().setPower(LB);
         opmode.getLeftFrontDrive().setPower(LF);
         opmode.getRightBackDrive().setPower(RB);
@@ -118,6 +118,8 @@ public class RobotDriver {
         rightBack.setPower(speed);
         //</editor-fold>
         while(leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()){
+            if(opmode instanceof AutonomousBaseOpMode) if(!((AutonomousBaseOpMode) opmode).opModeIsActive()) break;
+
             if(opmode instanceof OpMode){
                 ((OpMode) opmode).telemetry.addData("Speed", speed);
                 ((OpMode) opmode).telemetry.addData("Currently going:", "forward or backward");
@@ -147,7 +149,7 @@ public class RobotDriver {
         mecanumDriveForward(-inches, speed);
     }
 
-    public void mecanumDriveBackward(double speed){
+    public void mecanumDriveForward(double speed){
         //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
         DcMotor leftBack = opmode.getLeftBackDrive();
         DcMotor leftFront = opmode.getLeftFrontDrive();
@@ -159,8 +161,8 @@ public class RobotDriver {
         leftFront.setPower(speed);
         rightBack.setPower(speed);
     }
-    public void mecanumDriveForward(double speed){
-        mecanumDriveBackward(-speed);
+    public void mecanumDriveBackward(double speed){
+        mecanumDriveForward(-speed);
     }
 
 
@@ -197,6 +199,7 @@ public class RobotDriver {
         rightBack.setPower(-speed);
         //</editor-fold>
         while (leftBack.isBusy() && rightFront.isBusy() && leftFront.isBusy() && rightBack.isBusy()) {
+            if(opmode instanceof AutonomousBaseOpMode) if(!((AutonomousBaseOpMode) opmode).opModeIsActive()) break;
             if (opmode instanceof OpMode) {
                 ((OpMode) opmode).telemetry.addData("Speed", speed);
                 ((OpMode) opmode).telemetry.addData("Currently going: ", (inches < 0) ? "right" : "left");
@@ -220,13 +223,13 @@ public class RobotDriver {
         mecanumDriveLeft(-inches, speed);
     }
 
-    public void extendPullDownBar(double inches, double speed){
-        double aBAR_COUNTS_PER_MOTOR_REV  =    2240;
-        double aBAR_DRIVE_GEAR_REDUCTION  =   1;
-        double aBAR_WHEEL_DIAMETER_INCHES =   1.326;
-        double aBAR_COUNTS_PER_INCH       =   aBAR_COUNTS_PER_MOTOR_REV * (aBAR_DRIVE_GEAR_REDUCTION/aBAR_WHEEL_DIAMETER_INCHES)
-                / (Math.PI);
+    private final double aBAR_COUNTS_PER_MOTOR_REV  =    2240d;
+    private final double aBAR_DRIVE_GEAR_REDUCTION  =   1d;
+    private final double aBAR_WHEEL_DIAMETER_INCHES =   1.326d;
+    private final double aBAR_COUNTS_PER_INCH       =   aBAR_COUNTS_PER_MOTOR_REV * (aBAR_DRIVE_GEAR_REDUCTION/aBAR_WHEEL_DIAMETER_INCHES)
+            / (Math.PI);
 
+    public void extendPullDownBar(double inches, double speed){
         int newLeftTarget = opmode.getLeftpuldaun().getCurrentPosition() + (int)(inches * aBAR_COUNTS_PER_INCH);
         int newRightTarget = opmode.getRightpuldaun().getCurrentPosition() + (int)(inches * aBAR_COUNTS_PER_INCH);
 
@@ -240,6 +243,7 @@ public class RobotDriver {
         opmode.getLeftpuldaun().setPower(speed);
         opmode.getRightpuldaun().setPower(speed);
         while(opmode.getLeftpuldaun().isBusy() && opmode.getRightpuldaun().isBusy()){
+            if(opmode instanceof AutonomousBaseOpMode) if(!((AutonomousBaseOpMode) opmode).opModeIsActive()) break;
             if(opmode instanceof OpMode){
                 ((OpMode) opmode).telemetry.addData("Current Position Left :", opmode.getLeftpuldaun().getCurrentPosition());
                 ((OpMode) opmode).telemetry.addData("Current Position Right:", opmode.getRightpuldaun().getCurrentPosition());
@@ -257,7 +261,36 @@ public class RobotDriver {
         opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void mecanumDriveRight(double speed){
+    public void estimatedPullDownBar(double speed){
+        DcMotor leftPuldaun = opmode.getLeftpuldaun();
+        DcMotor rightPuldaun = opmode.getRightpuldaun();
+
+
+        leftPuldaun.setTargetPosition(leftPuldaun.getCurrentPosition() - 302);
+        rightPuldaun.setTargetPosition(rightPuldaun.getCurrentPosition() + 2400);
+
+        leftPuldaun.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightPuldaun.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftPuldaun.setPower(speed);
+        rightPuldaun.setPower(speed);
+        while(opmode.getLeftpuldaun().isBusy() && opmode.getRightpuldaun().isBusy()){
+            if(opmode instanceof AutonomousBaseOpMode) if(!((AutonomousBaseOpMode) opmode).opModeIsActive()) break;
+            if(opmode instanceof OpMode){
+                ((OpMode) opmode).telemetry.addData("Current Position Left :", opmode.getLeftpuldaun().getCurrentPosition());
+                ((OpMode) opmode).telemetry.addData("Current Position Right:", opmode.getRightpuldaun().getCurrentPosition());
+                ((OpMode) opmode).telemetry.update();
+            }
+        }
+        leftPuldaun.setPower(0);
+        rightPuldaun.setPower(0);
+
+
+        opmode.getLeftpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        opmode.getRightpuldaun().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void mecanumDriveLeft(double speed){
         //<editor-fold desc="Motors: leftBack, leftFront, rightBack, rightFront">
         DcMotor leftBack = opmode.getLeftBackDrive();
         DcMotor leftFront = opmode.getLeftFrontDrive();
@@ -269,8 +302,8 @@ public class RobotDriver {
         leftFront.setPower(-speed);
         rightBack.setPower(-speed);
     }
-    public void mecanumDriveLeft(double speed){
-        this.mecanumDriveRight(-speed);
+    public void mecanumDriveRight(double speed){
+        this.mecanumDriveLeft(-speed);
     }
 
 
@@ -287,7 +320,7 @@ public class RobotDriver {
         if(!gyroTurning) { // to make sure gyroTurn is not called again while it is already being done
             if (angle == 0) return; // if the angle is 0, just don't do anything
             try { //Opmode sleep function
-                Thread.sleep(750);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -357,6 +390,7 @@ public class RobotDriver {
                 /*
                     Below is just telemetry output so that we can see what's happening
                  */
+                if(opmode instanceof AutonomousBaseOpMode) if(!((AutonomousBaseOpMode) opmode).opModeIsActive()) break;
                 telemetry.addData("continue", !(qangle + CORRECT_ANGLE_RANGE >
                         getRelativeAngle() && getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE));
                 telemetry.addData("relative angle", getRelativeAngle());

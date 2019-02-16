@@ -4,9 +4,11 @@ package org.firstinspires.ftc.teamcode.baseopmodes;
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.VARIABLES;
+import org.firstinspires.ftc.teamcode.robot.RobotDriver;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -208,18 +211,12 @@ public final class HardwareMap {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         //</editor-fold>
-        synchronized (this){
-            int i = 0;
-            while(!imu.isGyroCalibrated()) {
-                try {
-                    telemetry.addData(i + " Gyro Calibrated:", imu.isGyroCalibrated());
-                    telemetry.update();
-                    i++;
-                    this.wait(50);
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
-            }
+        int i = 0;
+        while(!imu.isGyroCalibrated()  && RobotDriver.getDriver().getHardwareMap() instanceof LinearOpMode) {
+            if(!((LinearOpMode) RobotDriver.getDriver().getHardwareMap()).opModeIsActive()) break;
+            telemetry.addData(i + " Gyro Calibrated:", imu.isGyroCalibrated());
+            telemetry.update();
+            i++;
         }
     }
 

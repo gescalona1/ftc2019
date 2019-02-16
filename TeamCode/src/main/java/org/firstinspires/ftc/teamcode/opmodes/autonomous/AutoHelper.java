@@ -24,7 +24,7 @@ public class AutoHelper implements UsesHardware {
     private RobotDriver driver;
     private HardwareMap map;
     private Telemetry telemetry;
-    private final double SPEED = 0.9d;
+    private final double SPEED = 0.6d;
     private final double pullDownHeight = 5.1;
     public AutoHelper(AutonomousBaseOpMode baseOpMode) {
         this.baseOpMode = baseOpMode;
@@ -33,34 +33,32 @@ public class AutoHelper implements UsesHardware {
     }
 
     public void land(){
-        driver.extendPullDownBar(pullDownHeight - 0.1, 0.77d);
-        driver.gyroTurn(-20, 0.6, 4.5);
+        driver.extendPullDownBar(pullDownHeight - 0.4, 0.77d);
+        driver.gyroTurn(-15, 0.3, 2.5);
 
         driver.mecanumDriveForward(3, SPEED);
-        driver.gyroTurn(20, 0.6, 4.5);
-        driver.mecanumDriveRight(2, SPEED);
+        driver.gyroTurn(15, 0.2, 2);
+        //driver.mecanumDriveRight(2, SPEED);
         driver.mecanumDriveForward(12, SPEED);
     }
 
     public void knock(Position position){
         switch(position){
             case LEFT:
-                driver.mecanumDriveLeft(24, SPEED);
-                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
-                driver.mecanumDriveForward(9, SPEED);
+                driver.mecanumDriveLeft(20, SPEED);
+                driver.gyroTurn(driver.getAngle(), 0.35 , 4.5);
                 break;
             case RIGHT:
-                driver.mecanumDriveRight(22, SPEED);
-                driver.gyroTurn(driver.getAngle(), 0.5 , 4.5);
-                driver.mecanumDriveForward(9, SPEED);
+                driver.mecanumDriveRight(20, SPEED);
+                driver.gyroTurn(driver.getAngle(), 0.35 , 4.5);
                 break;
             case CENTER:
-                driver.mecanumDriveForward(9, SPEED);
+                driver.mecanumDriveRight(5, 1);
                 break;
             case NULL:
-                driver.mecanumDriveForward(9, SPEED);
                 break;
         }
+        driver.mecanumDriveForward(10, SPEED);
     }
 
 

@@ -100,26 +100,22 @@ public class DriverOpModeDriver extends DriverBaseOpMode {
         }
 
         if(gamepad1.right_trigger > 0) getRotate().setPower(gamepad1.right_trigger);
+        else if (gamepad2.right_trigger > 0) getRotate().setPower(gamepad2.right_trigger);
         else if(gamepad1.left_trigger > 0) getRotate().setPower(-gamepad1.left_trigger);
+        else if (gamepad2.left_trigger > 0) getRotate().setPower(-gamepad2.left_trigger);
         else getRotate().setPower(0);
 
-        if(gamepad1.y || gamepad2.y) getExtend().setPower(1);
-        else if(gamepad1.a || gamepad2.a) getExtend().setPower(-1);
+        if(gamepad1.dpad_right || gamepad2.dpad_right) getExtend().setPower(1);
+        else if(gamepad1.dpad_left || gamepad2.dpad_left) getExtend().setPower(-1);
         else getExtend().setPower(0);
 
-        if(gamepad1.x || gamepad2.x){
-            getBucket().setPosition(0);
-        }else if (gamepad1.b || gamepad2.b){
-            getBucket().setPosition(0.35);
-        }else getBucket().setPosition(0.5);
+        if(gamepad1.x || gamepad2.x) getBucket().setPosition(0);
+        else if (gamepad1.b || gamepad2.b) getBucket().setPosition(1);
+        else if (gamepad1.a || gamepad2.a) getBucket().setPosition(0.5);
 
-        if(gamepad1.dpad_up || gamepad2.dpad_up){
-            getIntake().setPosition(0);
-        } else if(gamepad1.dpad_down || gamepad2.dpad_down){
-            getIntake().setPosition(1);
-        } else{
-            getIntake().setPosition(0.5);
-        }
+        if(gamepad1.dpad_down || gamepad2.dpad_down) getIntake().setPosition(0);
+        else if(gamepad1.dpad_up || gamepad2.dpad_up) getIntake().setPosition(1);
+        else getIntake().setPosition(0.5);
         getMarker().setPosition((gamepad2.left_bumper) ? 1 : 0.35);
 
     }

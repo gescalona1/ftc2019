@@ -21,7 +21,7 @@ import java.util.Locale;
 public class MovingTest extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
-    private final double SPEED = 1d;
+    private final double SPEED = 1;
     /*
     Before waitforStart()
      */
@@ -43,21 +43,12 @@ public class MovingTest extends AutonomousBaseOpMode {
      */
     @Override
     protected void run() {
-        driver.mecanumDriveBackward(10 , SPEED);
-        driver.mecanumDriveForward(10, SPEED);
-        driver.mecanumDriveRight(10, SPEED);
-        driver.mecanumDriveLeft(10, SPEED);
+        driver.mecanumDriveForward(1);
+        while(getFrontDSensor().getDistance(DistanceUnit.INCH) > 30.0){
 
-        /*
-        if (opModeIsActive()) {
-
-            driver.mechanumDriveForward(1);
-            sleep(5 * 1000);
-            driver.mechanumDriveForward(0);
-            if (getTfod() != null) {
-                getTfod().shutdown();
-            }
         }
-        */
+        driver.mecanumDriveForward(0);
+        driver.gyroTurn(16, 0.5);
+        driver.mecanumDriveLeft(15, 1);
     }
 }

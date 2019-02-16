@@ -40,8 +40,9 @@ public class GyroTurnTest extends AutonomousBaseOpMode {
     protected void run() {
         driver.gyroTurn(driver.getAngle(), 0.55);
         sleep(5000);
-        driver.gyroTurn(-driver.getAngle(), 0.55);
-
+        driver.gyroTurn(90, 0.55);
+        sleep(5000);
+        driver.gyroTurn(-90, 0.55);
         /*
         sleep(750);
         driver.gyroTurn(-90, 0.5, 5);

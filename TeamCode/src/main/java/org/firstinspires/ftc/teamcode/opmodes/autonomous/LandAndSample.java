@@ -62,6 +62,7 @@ public class LandAndSample extends AutonomousBaseOpMode {
         }
         autoHelper.land();
         autoHelper.knock(position);
+        driver.mecanumDriveForward(7, 0.1);
         /*
         if (opModeIsActive()) {
 
