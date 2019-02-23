@@ -54,20 +54,28 @@ public class LandSampleTeamMarker extends AutonomousBaseOpMode {
                 break;
             }
         }
+        position = (position != Position.NULL) ? position : Position.CENTER;
         autoHelper.land();
+        FindMineralRunnable.forceStop();
         autoHelper.knock(position);
+
         switch (position){
             case LEFT:
                 driver.mecanumDriveForward(12, 0.5);
-                driver.gyroTurn(20, 0.3, 3);
+                driver.gyroTurn(20, 0.2, 3);
                 driver.mecanumDriveLeft(0.5);
                 while(getLeftDSensor().getDistance(DistanceUnit.INCH) > 2.1){
-
+                    if(!opModeIsActive()) break;
                 }
                 driver.mecanumDriveLeft(0);
                 driver.mecanumDriveForward(0.5);
+                double current = getRuntime();
                 while(getFrontDSensor().getDistance(DistanceUnit.INCH) > 20.0){
-
+                    if(!opModeIsActive()) break;
+                    if(getRuntime() - current > 6 ){
+                        driver.mecanumDriveBackward(6, SPEED);
+                        break;
+                    }
                 }
                 driver.mecanumDriveForward(0);
                 getMarker().setPosition(1);
@@ -78,41 +86,45 @@ public class LandSampleTeamMarker extends AutonomousBaseOpMode {
             case CENTER:
                 driver.mecanumDriveForward(0.5);
                 while(getFrontDSensor().getDistance(DistanceUnit.INCH) > 30.0){
-
+                    if(!opModeIsActive()) break;
                 }
                 driver.mecanumDriveForward(0);
 
-                driver.gyroTurn(18, 0.3, 3.5);
+                driver.gyroTurn(18, 0.2, 3.5);
                 getMarker().setPosition(1);
                 driver.mecanumDriveLeft(0.5);
                 while(getLeftDSensor().getDistance(DistanceUnit.INCH) > 2){
-
+                    if(!opModeIsActive()) break;
                 }
                 driver.mecanumDriveLeft(0);
                 break;
             case RIGHT:
                 driver.mecanumDriveForward(15, 0.5);
                 driver.mecanumDriveBackward(9, 0.5);
-                driver.gyroTurn(driver.getAngle(), 0.3, 3);
-                driver.gyroTurn(30, 0.3, 3);
+                driver.gyroTurn(driver.getAngle(), 0.2, 3);
+                driver.gyroTurn(30, 0.2, 3);
                 driver.mecanumDriveForward(0.5);
                 while(getFrontDSensor().getDistance(DistanceUnit.INCH) > 4){
-
+                    if(!opModeIsActive()) break;
                 }
                 driver.mecanumDriveForward(0);
                 driver.mecanumDriveBackward(1, 0.5);
                 driver.mecanumDriveLeft(0.5);
                 while(getLeftDSensor().getDistance(DistanceUnit.INCH) > 2.6){}
                 driver.mecanumDriveLeft(0);
-                driver.mecanumDriveBackward(1);
-                while(getFrontDSensor().getDistance(DistanceUnit.INCH) < 17){}
-                driver.mecanumDriveBackward(0);
                 getMarker().setPosition(1);
+                sleep(250);
+                driver.mecanumDriveBackward(1);
+                while(getFrontDSensor().getDistance(DistanceUnit.INCH) < 17){
+
+                }
+                driver.mecanumDriveBackward(0);
+
                 driver.mecanumDriveLeft(6, 1);
                 break;
         }
         driver.mecanumDriveBackward(35, 0.9);
-        driver.mecanumDriveLeft(18, 0.5);
+        driver.mecanumDriveLeft(18, 0.8);
         driver.mecanumDriveBackward(25, 0.24);
         /*
         driver.mecanumDriveBackward(9, 1);

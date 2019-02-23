@@ -20,7 +20,7 @@ import java.util.ArrayList;
  *
  * @version 1.0 10/11/2018
  */
-@Autonomous(name = "Voice Test", group = "auto")
+@Autonomous(name = "RunTime Test", group = "auto")
 public class VoiceTest extends AutonomousBaseOpMode {
     RobotDriver driver = RobotDriver.getDriver();
     private Position position;
@@ -30,11 +30,7 @@ public class VoiceTest extends AutonomousBaseOpMode {
      */
     @Override
     protected void prerun() {
-        S s = new S(hardwareMap.appContext, telemetry);
-        s.doThis();
-        while(!opModeIsActive()){
-            telemetry.addData("matches", S.getWords());
-        }
+        resetStartTime();
     }
     /*
     After waitForStart()

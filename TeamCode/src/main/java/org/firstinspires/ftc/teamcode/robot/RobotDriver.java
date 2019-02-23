@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+import org.firstinspires.ftc.robotcore.external.function.InterruptableThrowingRunnable;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -377,7 +379,6 @@ public class RobotDriver {
             opmode.getLeftBackDrive().setPower(leftbackpower);
             opmode.getRightFrontDrive().setPower(rightfrontpower);
             opmode.getRightBackDrive().setPower(rightbackpower);
-            int i = 0; //See later code
             final double qangle = angle;
             /* Sample simulation
             if qangle = 90 and CORRECT_ANGLE_RANGE = 2.5
@@ -385,24 +386,14 @@ public class RobotDriver {
             true = while loop breaks
             false = while loop still goes
              */
+            LinearOpMode linearOpMode = null;
+            if(opmode instanceof LinearOpMode) linearOpMode = (LinearOpMode) opmode;
             while(!(qangle + CORRECT_ANGLE_RANGE > getRelativeAngle() &&
                     getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE)){
                 /*
                     Below is just telemetry output so that we can see what's happening
                  */
-                if(opmode instanceof AutonomousBaseOpMode) if(!((AutonomousBaseOpMode) opmode).opModeIsActive()) break;
-                telemetry.addData("continue", !(qangle + CORRECT_ANGLE_RANGE >
-                        getRelativeAngle() && getRelativeAngle() > qangle - CORRECT_ANGLE_RANGE));
-                telemetry.addData("relative angle", getRelativeAngle());
-                telemetry.addData("requiredAngle with correction",
-                        (qangle - CORRECT_ANGLE_RANGE) + " to " + (qangle + CORRECT_ANGLE_RANGE));
-                telemetry.addData("difference actual", Math.abs(getRelativeAngle() - qangle));
-                telemetry.addData("checked how many times:", i);
-                telemetry.update();
-                if(i >= 1500) {
-                    break; //if it checks too many times, break out
-                }
-                i++;
+                if(linearOpMode != null && !linearOpMode.opModeIsActive()) break;
             }
             // Cleaning up, setting motors' powers to 0
             opmode.getLeftFrontDrive().setPower(0);
@@ -412,6 +403,7 @@ public class RobotDriver {
             gyroTurning = false;
         }
     }
+
     public void gyroTurn(double angle, double power){
         this.gyroTurn(angle, power, 2.5);
     }
@@ -465,7 +457,7 @@ public class RobotDriver {
         return correctAngle(correctAngle(getAngle()) -  correctAngle(getCurrentAngle()));
     }
 
-    public boolean IsGyroTurning(){
+    public final boolean IsGyroTurning(){
         return gyroTurning;
     }
     /**

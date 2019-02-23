@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.util.Position;
  */
 
 public class AutoHelper implements UsesHardware {
+    //<editor-fold desc="Setting up">
     private AutonomousBaseOpMode baseOpMode;
     private RobotDriver driver;
     private HardwareMap map;
@@ -31,13 +32,13 @@ public class AutoHelper implements UsesHardware {
         this.driver = RobotDriver.getDriver();
         this.map = baseOpMode.getMap();
     }
-
+    //</editor-fold desc="DcMotorSetup">
     public void land(){
         driver.extendPullDownBar(pullDownHeight - 0.4, 0.77d);
-        driver.gyroTurn(-15, 0.3, 2.5);
+        driver.gyroTurn(-15, 0.2, 2.5);
 
         driver.mecanumDriveForward(3, SPEED);
-        driver.gyroTurn(15, 0.2, 2);
+        driver.gyroTurn(15, 0.2, 2.7);
         //driver.mecanumDriveRight(2, SPEED);
         driver.mecanumDriveForward(12, SPEED);
     }
@@ -46,11 +47,11 @@ public class AutoHelper implements UsesHardware {
         switch(position){
             case LEFT:
                 driver.mecanumDriveLeft(20, SPEED);
-                driver.gyroTurn(driver.getAngle(), 0.35 , 4.5);
+                driver.gyroTurn(driver.getAngle(), 0.2 , 3.5);
                 break;
             case RIGHT:
                 driver.mecanumDriveRight(20, SPEED);
-                driver.gyroTurn(driver.getAngle(), 0.35 , 4.5);
+                driver.gyroTurn(driver.getAngle(), 0.2 , 3.5);
                 break;
             case CENTER:
                 driver.mecanumDriveRight(5, 1);

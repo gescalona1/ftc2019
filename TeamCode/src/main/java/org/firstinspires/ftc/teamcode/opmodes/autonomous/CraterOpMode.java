@@ -94,7 +94,7 @@ public class CraterOpMode extends AutonomousBaseOpMode {
 
         position = (position != null) ? position : Position.RIGHT;
         FindMineralRunnable.setRecordData(false);
-
+        FindMineralRunnable.forceStop();
         autoHelper.knock(position);
 
         driver.mecanumDriveBackward(8, SPEED);
@@ -115,12 +115,22 @@ public class CraterOpMode extends AutonomousBaseOpMode {
         driver.mecanumDriveForward(15, SPEED);
         driver.gyroTurn(-30, 0.45, 3.2);
         driver.mecanumDriveRight(SPEED);
-        while(getRightDSensor().getDistance(DistanceUnit.INCH) > 2){}
+        while(getRightDSensor().getDistance(DistanceUnit.INCH) > 2){
+            if(!opModeIsActive()) break;
+        }
         driver.mecanumDriveRight(10, SPEED);
         driver.mecanumDriveForward(SPEED); //distance
         getLeftBackDrive().setPower(1);
+        double current = getRuntime();
+
         while(!(getFrontDSensor().getDistance(DistanceUnit.INCH) <= 20.0) && opModeIsActive()){
-            if(isStopRequested() || (getFrontDSensor().getDistance(DistanceUnit.INCH) >= 10.0 && getFrontDSensor().getDistance(DistanceUnit.INCH) <= 20.0)) break;
+            telemetry.addData("dsensor f", getFrontDSensor().getDistance(DistanceUnit.INCH));
+            telemetry.update();
+            if(!opModeIsActive() || (getFrontDSensor().getDistance(DistanceUnit.INCH) >= 10.0 && getFrontDSensor().getDistance(DistanceUnit.INCH) <= 20.0)) break;
+            if(getRuntime() - current > 6 ){
+                driver.mecanumDriveBackward(6, SPEED);
+                break;
+            }
         }
         driver.mecanumDriveForward(0);
         /*
